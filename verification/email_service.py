@@ -60,6 +60,12 @@ class EmailVerificationService:
             html_message=html_message,
             fail_silently=False,
         )
+        logger.info(
+            'Email sent | backend=%s from=%s to=%s',
+            settings.EMAIL_BACKEND,
+            settings.DEFAULT_FROM_EMAIL,
+            verification.email,
+        )
 
     @staticmethod
     def verify_otp(user, otp):

@@ -241,3 +241,18 @@ if os.environ.get('CLOUD_NAME') and os.environ.get('CLOUD_API_KEY') and os.envir
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'verification': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}
