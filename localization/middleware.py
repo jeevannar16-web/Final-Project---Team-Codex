@@ -23,8 +23,10 @@ class LanguageMiddleware:
         _thread_locals.language_code = lang_code
         if hasattr(request, 'session'):
             request.session['django_language'] = lang_code
-        response = self.get_response(request)
-        _thread_locals.language_code = None
+        try:
+            response = self.get_response(request)
+        finally:
+            _thread_locals.language_code = None
         if not response.cookies.get('django_language'):
             response.set_cookie('django_language', lang_code, max_age=31536000)
         return response

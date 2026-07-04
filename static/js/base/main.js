@@ -53,18 +53,7 @@ function getCookie(name) {
 // ==============================================================================
 
 function showToast(message, isError = false) {
-  const container = document.getElementById('single-toast-container');
-  if (!container) { alert(message); return; }
-  const toast = document.createElement('div');
-  toast.className = 'custom-animated-toast theme-' + (isError ? 'warning' : 'success');
-  toast.innerHTML = '<span>' + message + '</span>';
-  container.appendChild(toast);
-  setTimeout(() => toast.classList.add('reveal-slide'), 10);
-  setTimeout(() => {
-    toast.style.transition = 'all 0.4s ease';
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 400);
-  }, 2600);
+  // Toasts disabled
 }
 
 
