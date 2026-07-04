@@ -9,14 +9,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{% block title %}FITNESS HUB{% endblock %}</title>
-  <meta name="description" content="{% block meta_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop our curated collection of workout equipment, activewear, and supplements.{% endblock %}">
+  <meta name="description" content="{% block meta_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop curated workout equipment, activewear, and supplements for every body.{% endblock %}">
+
+  <!-- ====================================================================== -->
+  <!-- Open Graph (Facebook, LinkedIn, Discord, Telegram)                     -->
+  <!-- ====================================================================== -->
   <meta property="og:title" content="{% block og_title %}FITNESS HUB — Premium Fitness Gear{% endblock %}">
-  <meta property="og:description" content="{% block og_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop our curated collection of workout equipment, activewear, and supplements.{% endblock %}">
+  <meta property="og:description" content="{% block og_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop curated workout equipment, activewear, and supplements for every body.{% endblock %}">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   <meta property="og:site_name" content="FITNESS HUB">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{% block twitter_title %}FITNESS HUB{% endblock %}">
+  <meta property="og:locale" content="{{ LANGUAGE_CODE|default:'en_US' }}">
+  {% block og_image %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.jpg' %}">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="FITNESS HUB logo — Premium Fitness Gear & Sportswear">
+  {% endblock %}
+
+  <!-- ====================================================================== -->
+  <!-- Twitter Card                                                            -->
+  <!-- ====================================================================== -->
+  <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+  <meta name="twitter:title" content="{% block twitter_title %}FITNESS HUB — Premium Fitness Gear{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop curated workout equipment, activewear, and supplements for every body.{% endblock %}">
+  {% block twitter_image %}
+  <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.jpg' %}">
+  {% endblock %}
+
+  <!-- ====================================================================== -->
+  <!-- Canonical URL                                                           -->
+  <!-- ====================================================================== -->
   <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
 
   <!-- Head: Fonts, Icons, Leaflet -->
