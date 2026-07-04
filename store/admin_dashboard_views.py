@@ -1,8 +1,14 @@
 """Admin dashboard views."""
 
+import logging
+import traceback
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.http import HttpResponseServerError
+
+logger = logging.getLogger(__name__)
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -20,33 +26,37 @@ from django.db.models.functions import TruncMonth
 
 @staff_member_required
 def admin_dashboard(request):
-    total_users = User.objects.count()
-    total_verified_users = Profile.objects.filter(is_email_verified=True).count()
-    total_unverified_users = total_users - total_verified_users
-    total_products = Product.objects.count()
-    total_orders = Order.objects.count()
-    total_revenue = Order.objects.exclude(status='Cancelled').aggregate(t=Sum('total_amount'))['t'] or 0
-    total_categories = Category.objects.count()
-    total_reviews = Review.objects.count()
-    total_subscribers = NewsletterSubscriber.objects.count()
+    try:
+        total_users = User.objects.count()
+        total_verified_users = Profile.objects.filter(is_email_verified=True).count()
+        total_unverified_users = total_users - total_verified_users
+        total_products = Product.objects.count()
+        total_orders = Order.objects.count()
+        total_revenue = Order.objects.exclude(status='Cancelled').aggregate(t=Sum('total_amount'))['t'] or 0
+        total_categories = Category.objects.count()
+        total_reviews = Review.objects.count()
+        total_subscribers = NewsletterSubscriber.objects.count()
 
-    recent_orders = Order.objects.all().order_by('-created_at')[:10]
-    low_stock_products = Product.objects.filter(stock__lt=5).order_by('stock')[:10]
+        recent_orders = Order.objects.all().order_by('-created_at')[:10]
+        low_stock_products = Product.objects.filter(stock__lt=5).order_by('stock')[:10]
 
-    pending_sellers = Profile.objects.filter(seller_requested=True, is_seller=False).select_related('user')
-    current_sellers = Profile.objects.filter(is_seller=True).select_related('user')
+        pending_sellers = Profile.objects.filter(seller_requested=True, is_seller=False).select_related('user')
+        current_sellers = Profile.objects.filter(is_seller=True).select_related('user')
 
-    order_status_counts = Order.objects.values('status').annotate(count=Count('id')).order_by('status')
-    status_labels = dict(Order.STATUS_CHOICES)
-    order_status_breakdown = {item['status']: {'count': item['count'], 'label': status_labels.get(item['status'], item['status'])} for item in order_status_counts}
+        order_status_counts = Order.objects.values('status').annotate(count=Count('id')).order_by('status')
+        status_labels = dict(Order.STATUS_CHOICES)
+        order_status_breakdown = {item['status']: {'count': item['count'], 'label': status_labels.get(item['status'], item['status'])} for item in order_status_counts}
 
-    total_favorites_count = FavoriteItem.objects.count()
-    total_cart_items_count = CartItem.objects.count()
-    active_cart_users = CartItem.objects.values('user').distinct().count()
+        total_favorites_count = FavoriteItem.objects.count()
+        total_cart_items_count = CartItem.objects.count()
+        active_cart_users = CartItem.objects.values('user').distinct().count()
 
-    recent_favorites = FavoriteItem.objects.select_related('user', 'product').order_by('-created_at')[:10]
-    recent_cart_items = CartItem.objects.select_related('user', 'product').order_by('-added_at')[:10]
-    recent_users = User.objects.exclude(profile__isnull=True).select_related('profile').order_by('-date_joined')[:10]
+        recent_favorites = FavoriteItem.objects.select_related('user', 'product').order_by('-created_at')[:10]
+        recent_cart_items = CartItem.objects.select_related('user', 'product').order_by('-added_at')[:10]
+        recent_users = User.objects.exclude(profile__isnull=True).select_related('profile').order_by('-date_joined')[:10]
+    except Exception as e:
+        logger.error('admin_dashboard data query failed: %s\n%s', e, traceback.format_exc())
+        return HttpResponseServerError('Admin dashboard query failed. Check logs.')
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -95,29 +105,33 @@ def admin_dashboard(request):
             messages.success(request, f"@{profile.user.username}'s seller access revoked.")
         return redirect('store:admin_dashboard')
 
-    context = {
-        'total_users': total_users,
-        'total_verified_users': total_verified_users,
-        'total_unverified_users': total_unverified_users,
-        'total_products': total_products,
-        'total_orders': total_orders,
-        'total_revenue': total_revenue,
-        'total_categories': total_categories,
-        'total_reviews': total_reviews,
-        'total_subscribers': total_subscribers,
-        'recent_orders': recent_orders,
-        'low_stock_products': low_stock_products,
-        'pending_sellers': pending_sellers,
-        'current_sellers': current_sellers,
-        'total_favorites_count': total_favorites_count,
-        'total_cart_items_count': total_cart_items_count,
-        'active_cart_users': active_cart_users,
-        'recent_favorites': recent_favorites,
-        'recent_cart_items': recent_cart_items,
-        'recent_users': recent_users,
-        'order_status_breakdown': order_status_breakdown,
-    }
-    return render(request, 'store/admin_dashboard.html', context)
+    try:
+        context = {
+            'total_users': total_users,
+            'total_verified_users': total_verified_users,
+            'total_unverified_users': total_unverified_users,
+            'total_products': total_products,
+            'total_orders': total_orders,
+            'total_revenue': total_revenue,
+            'total_categories': total_categories,
+            'total_reviews': total_reviews,
+            'total_subscribers': total_subscribers,
+            'recent_orders': recent_orders,
+            'low_stock_products': low_stock_products,
+            'pending_sellers': pending_sellers,
+            'current_sellers': current_sellers,
+            'total_favorites_count': total_favorites_count,
+            'total_cart_items_count': total_cart_items_count,
+            'active_cart_users': active_cart_users,
+            'recent_favorites': recent_favorites,
+            'recent_cart_items': recent_cart_items,
+            'recent_users': recent_users,
+            'order_status_breakdown': order_status_breakdown,
+        }
+        return render(request, 'store/admin_dashboard.html', context)
+    except Exception as e:
+        logger.error('admin_dashboard render failed: %s\n%s', e, traceback.format_exc())
+        return HttpResponseServerError('Admin dashboard render failed. Check logs.')
 
 
 
