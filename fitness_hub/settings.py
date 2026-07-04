@@ -202,15 +202,24 @@ EMAIL_TIMEOUT = 5
 
 # Auto-configure email in order of preference:
 # 1) Explicit EMAIL_HOST_USER/PASSWORD (e.g. Gmail SMTP)
-# 2) SENDGRID_API_KEY — HTTP API fallback (works on Render free tier)
-# 3) Console backend (logs only)
+# 2) BREVO_API_KEY — HTTP API (works on Render free tier)
+# 3) SENDGRID_API_KEY — HTTP API fallback
+# 4) Console backend (logs only)
 
 sendgrid_key = os.environ.get('SENDGRID_API_KEY', '')
+SENDGRID_API_KEY = sendgrid_key
+brevo_key = os.environ.get('BREVO_API_KEY', '')
+BREVO_API_KEY = brevo_key
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = 'fitness_hub.email_backend.ResilientEmailBackend'
     print(f'[Email] Resilient backend — SMTP host={EMAIL_HOST} user={EMAIL_HOST_USER} from={DEFAULT_FROM_EMAIL}', flush=True)
-    if sendgrid_key:
+    if brevo_key:
+        print(f'[Email] Brevo API fallback available', flush=True)
+    elif sendgrid_key:
         print(f'[Email] SendGrid API fallback available', flush=True)
+elif brevo_key:
+    EMAIL_BACKEND = 'fitness_hub.email_backend.ResilientEmailBackend'
+    print(f'[Email] Brevo-only backend — using Brevo API for delivery from={DEFAULT_FROM_EMAIL}', flush=True)
 elif sendgrid_key:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = 'smtp.sendgrid.net'
