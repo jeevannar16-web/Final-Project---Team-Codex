@@ -79,12 +79,35 @@ Full-stack Django ecommerce platform with seller marketplace, admin dashboard, r
 git clone <repo-url>
 cd Ojt-Ecommerce-Website
 cp .env.example .env
+# Fill in your env vars (see .env.example)
 ./start.sh
 ```
 
 One command creates venv, installs deps, and starts the server. The database (`db.sqlite3`) is included in the repo — products and data come pre-loaded.
 
 Windows: `start.bat`
+
+---
+
+## Email Configuration
+
+Emails (welcome, OTP, password reset, order confirmations) use a **resilient multi-backend** system that tries providers in order until one succeeds:
+
+1. **Gmail SMTP** — works locally, blocked on Render free tier
+2. **Brevo API** — HTTP API (works on Render), free tier: 300 emails/day
+3. **SendGrid API** — HTTP API fallback (optional)
+4. **Console** — logs to stdout (last resort)
+
+### Setup on Render
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `EMAIL_HOST_USER` | Yes | Gmail address for SMTP |
+| `EMAIL_HOST_PASSWORD` | Yes | Gmail App Password |
+| `BREVO_API_KEY` | Recommended | Brevo API key (sends on Render) |
+| `DEFAULT_FROM_EMAIL` | Yes | Sender address (e.g. `jeevannar16@gmail.com`) |
+
+For Brevo, sign up at brevo.com, create an API key under **SMTP & API → API Keys**, and add it as `BREVO_API_KEY` in Render env vars.
 
 ---
 
@@ -107,11 +130,12 @@ Windows: `start.bat`
 
 ## Tech Stack
 
-- **Backend:** Django 5.0, Python 3.12
+- **Backend:** Django 5.0, Python 3.14
 - **Database:** SQLite (dev) / PostgreSQL (production on Render)
 - **Static files:** Whitenoise (compressed, manifest-based, 1-year cache)
 - **Images:** Cloudinary CDN with auto-resize thumbnails
 - **Auth:** django-allauth (email + Google OAuth)
+- **Email:** Gmail SMTP + Brevo API (HTTP, works on Render free tier) + SendGrid fallback
 - **Maps:** Leaflet + OpenStreetMap (no API key)
 - **Deployment:** Render (free tier), GitHub Actions (keep-alive + status checks)
 - **Error tracking:** Sentry
@@ -141,3 +165,5 @@ Windows: `start.bat`
 - Themes use CSS custom properties with session storage
 - Maps use Leaflet — no API key, completely free
 - All API keys sourced from `.env` only; no hardcoded secrets
+- Python 3.14 broke Django's `BaseContext.__copy__` — monkey-patched in `fitness_hub/__init__.py` via `object.__new__`
+- Email uses resilient multi-backend (`ResilientEmailBackend`) — tries SMTP, then Brevo API, then SendGrid API, then console; never crashes on failure
