@@ -1,9 +1,11 @@
 """Custom allauth adapters."""
 
 import logging
+import traceback
 
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.socialaccount.models import SocialAccount, SocialLogin
 from allauth.exceptions import ImmediateHttpResponse
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -26,8 +28,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def on_authentication_error(self, request, provider, error=None, exception=None, extra_context=None):
         logger.error(
-            "Social login failed | provider=%s error=%s exception=%r",
-            provider.id if provider else '?', error, exception
+            "Social login failed | provider=%s error=%s exception=%r\n%s",
+            provider.id if provider else '?', error, exception,
+            traceback.format_exc()
         )
         messages.error(request, 'Google login failed. Please try again or use email/password.')
         raise ImmediateHttpResponse(redirect('login'))
@@ -42,14 +45,28 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             return
 
         email = sociallogin.account.extra_data.get('email', '').lower()
-        if email:
-            User = get_user_model()
-            try:
-                user = User.objects.get(email=email)
-                sociallogin.connect(request, user)
-                self._log_social_login(user, request)
-            except User.DoesNotExist:
-                pass
+        if not email:
+            return
+
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return
+
+        # Connect or retrieve existing SocialAccount
+        sa, _ = SocialAccount.objects.get_or_create(
+            provider=sociallogin.account.provider,
+            uid=sociallogin.account.uid,
+            defaults={'user': user, 'extra_data': sociallogin.account.extra_data}
+        )
+        if sa.user_id != user.id:
+            sa.user = user
+            sa.save()
+        sociallogin.user = user
+        sociallogin.account = sa
+        sociallogin.state['process'] = 'login'
+        self._log_social_login(user, request)
 
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form=form)
