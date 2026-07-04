@@ -29,6 +29,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             "Social login failed | provider=%s error=%s exception=%r",
             provider.id if provider else '?', error, exception
         )
+        messages.error(request, 'Google login failed. Please try again or use email/password.')
+        raise ImmediateHttpResponse(redirect('login'))
 
     def _log_social_login(self, user, request):
         from store.activity_logger import log_action

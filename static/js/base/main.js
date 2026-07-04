@@ -53,7 +53,13 @@ function getCookie(name) {
 // ==============================================================================
 
 function showToast(message, isError = false) {
-  // Toasts disabled
+  const container = document.getElementById('single-toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'msg-toast' + (isError ? ' error' : '');
+  toast.innerHTML = '<span class="msg-text">' + message + '</span><button class="msg-close" onclick="this.parentElement.remove()">&times;</button>';
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 5000);
 }
 
 

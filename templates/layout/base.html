@@ -91,6 +91,9 @@
     <span>{{ 'You are offline. Some features may be unavailable.'|t }}</span>
   </div>
 
+  <!-- Pre-Header: Messages (Django flash messages) -->
+  {% include 'includes/messages.html' %}
+
   <!-- Header: Announcement Bar -->
   {% include 'includes/announcement_bar.html' %}
   <!-- Header: Main Navigation -->
@@ -300,6 +303,8 @@
     });
   })();
   </script>
+
+  {% include 'includes/toast_container.html' %}
 
 </body>
 </html>

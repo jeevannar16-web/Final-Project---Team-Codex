@@ -71,19 +71,21 @@ if staff.exists():
 else:
     print('No staff accounts found')
 
-# --- Ensure superuser jeevan exists (password from env or auto-generated) ---
+# --- Ensure superuser exists (password from env or default 'jeevan120') ---
 admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
+# Create 'admin' user (or use ADMIN_USERNAME env var)
+admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
 user, created = User.objects.get_or_create(
-    username='jeevan',
+    username=admin_username,
     defaults={'email': admin_email, 'is_superuser': True, 'is_staff': True}
 )
-admin_pass = os.environ.get('ADMIN_PASSWORD', User.objects.make_random_password())
+admin_pass = os.environ.get('ADMIN_PASSWORD', 'jeevan120')
 user.set_password(admin_pass)
 user.is_superuser = True
 user.is_staff = True
 user.save()
 status = 'created' if created else 'updated'
-print(f'superuser jeevan {status}')
+print(f'superuser {admin_username} {status}')
 
 # --- Site domain ---
 domain = os.environ.get('BASE_URL', 'https://ojt-ecommerce-website.onrender.com').replace('https://','').replace('http://','').split('/')[0]

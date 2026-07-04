@@ -23,7 +23,7 @@ def verification_setup(request):
     email_verified = profile and profile.is_email_verified
     phone_verified = profile and profile.is_phone_verified
 
-    if email_verified and phone_verified:
+    if email_verified:
         return redirect('home')
 
     if request.method == 'POST':
