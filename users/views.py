@@ -46,14 +46,16 @@ class CustomPasswordResetForm(PasswordResetForm):
     def send_mail(self, subject_template_name, email_template_name, context,
                   from_email, to_email, html_email_template_name=None):
         context['current_year'] = timezone.now().year
-        try:
-            super().send_mail(subject_template_name, email_template_name, context,
-                              from_email, to_email, html_email_template_name=html_email_template_name)
-            logger.info('Password reset email sent to %s | backend=%s', to_email, settings.EMAIL_BACKEND)
-        except Exception as e:
-            logger.error('Password reset email FAILED to %s | backend=%s error=%s',
-                         to_email, settings.EMAIL_BACKEND, e)
-            raise
+        _context = context
+        def _send():
+            try:
+                super().send_mail(subject_template_name, email_template_name, _context,
+                                  from_email, to_email, html_email_template_name=html_email_template_name)
+                logger.info('Password reset email sent to %s | backend=%s', to_email, settings.EMAIL_BACKEND)
+            except Exception as e:
+                logger.error('Password reset email FAILED to %s | backend=%s error=%s',
+                             to_email, settings.EMAIL_BACKEND, e)
+        threading.Thread(target=_send, daemon=True).start()
 
 
 class CustomPasswordResetView(PasswordResetView):
