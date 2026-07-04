@@ -2,6 +2,7 @@
 
 import logging
 import traceback
+import functools
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
@@ -23,8 +24,20 @@ from django.core.paginator import Paginator
 from django.db.models.functions import TruncMonth
 
 
+def catch_errors(view_func):
+    @functools.wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except Exception as e:
+            logger.error('Admin view %s failed: %s\n%s', view_func.__name__, e, traceback.format_exc())
+            return HttpResponseServerError('Something went wrong. Check logs.')
+    return wrapper
+
+
 
 @staff_member_required
+@catch_errors
 def admin_dashboard(request):
     try:
         total_users = User.objects.count()
@@ -136,6 +149,7 @@ def admin_dashboard(request):
 
 
 @staff_member_required
+@catch_errors
 def admin_activity_log(request):
     logs = ActivityLog.objects.all().select_related('user')
 
@@ -179,6 +193,7 @@ def admin_activity_log(request):
 
 
 @staff_member_required
+@catch_errors
 def admin_favorites(request):
     favorites = FavoriteItem.objects.select_related('user', 'product').order_by('-created_at')
 
@@ -221,6 +236,7 @@ def admin_favorites(request):
 
 
 @staff_member_required
+@catch_errors
 def admin_cart(request):
     cart_items = CartItem.objects.select_related('user', 'product').order_by('-added_at')
 
@@ -268,6 +284,7 @@ def admin_cart(request):
 
 
 @staff_member_required
+@catch_errors
 def admin_sellers(request):
     search = request.GET.get('search', '').strip()
     sort = request.GET.get('sort', 'name')
@@ -344,6 +361,7 @@ def admin_sellers(request):
 
 
 @staff_member_required
+@catch_errors
 def admin_seller_detail(request, seller_id):
     seller = get_object_or_404(User, id=seller_id)
     profile = get_object_or_404(Profile, user=seller, is_seller=True)
@@ -406,6 +424,7 @@ def admin_seller_detail(request, seller_id):
 
 
 @staff_member_required
+@catch_errors
 def admin_newsletter_broadcast(request):
     if request.method == 'POST':
         subject = request.POST.get('subject', '').strip()
@@ -451,6 +470,7 @@ def admin_newsletter_broadcast(request):
 
 
 @staff_member_required
+@catch_errors
 def admin_manage_subscribers(request):
     subscribers = NewsletterSubscriber.objects.all().order_by('-subscribed_at')
 

@@ -16,6 +16,11 @@ class ProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile Details'
 
+    def get_formset(self, request, obj=None, **kwargs):
+        if obj:
+            Profile.objects.get_or_create(user=obj)
+        return super().get_formset(request, obj, **kwargs)
+
 
 # 2. Embed the inline into a custom User structural view
 class CustomUserAdmin(UserAdmin):

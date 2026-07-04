@@ -32,7 +32,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             provider.id if provider else '?', error, exception,
             traceback.format_exc()
         )
-        messages.error(request, 'Google login failed. Please try again or use email/password.')
+        # Silent redirect — user can retry
         raise ImmediateHttpResponse(redirect('login'))
 
     def _log_social_login(self, user, request):
@@ -40,33 +40,35 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         log_action(user, 'social_login', f"Logged in via Google ({user.email})", request=request)
 
     def pre_social_login(self, request, sociallogin):
-        if sociallogin.is_existing:
-            self._log_social_login(sociallogin.user, request)
-            return
-
-        email = sociallogin.account.extra_data.get('email', '').lower()
-        if not email:
-            return
-
-        User = get_user_model()
         try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return
+            if sociallogin.is_existing:
+                self._log_social_login(sociallogin.user, request)
+                return
 
-        # Connect or retrieve existing SocialAccount
-        sa, _ = SocialAccount.objects.get_or_create(
-            provider=sociallogin.account.provider,
-            uid=sociallogin.account.uid,
-            defaults={'user': user, 'extra_data': sociallogin.account.extra_data}
-        )
-        if sa.user_id != user.id:
-            sa.user = user
-            sa.save()
-        sociallogin.user = user
-        sociallogin.account = sa
-        sociallogin.state['process'] = 'login'
-        self._log_social_login(user, request)
+            email = sociallogin.account.extra_data.get('email', '').lower()
+            if not email:
+                return
+
+            User = get_user_model()
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return
+
+            sa, created = SocialAccount.objects.get_or_create(
+                provider=sociallogin.account.provider,
+                uid=sociallogin.account.uid,
+                defaults={'user': user, 'extra_data': sociallogin.account.extra_data}
+            )
+            if not created and sa.user_id != user.id:
+                sa.user = user
+                sa.save()
+            sociallogin.user = user
+            sociallogin.account = sa
+            sociallogin.state['process'] = 'login'
+            self._log_social_login(user, request)
+        except Exception as e:
+            logger.error('pre_social_login error: %s\n%s', e, traceback.format_exc())
 
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form=form)
