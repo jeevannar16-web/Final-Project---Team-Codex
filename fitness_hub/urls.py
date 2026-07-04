@@ -40,7 +40,11 @@ if settings.DEBUG:
 def handler404(request, exception=None):
     return render(request, '404.html', status=404)
 
+import logging
+logger = logging.getLogger(__name__)
+
 def handler500(request):
+    logger.error('500 error on %s %s', request.method, request.path)
     return HttpResponse("""
 <!DOCTYPE html><html><head><title>Server Error — FITNESS HUB</title>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
