@@ -37,31 +37,19 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         log_action(user, 'social_login', f"Logged in via Google ({user.email})", request=request)
 
     def pre_social_login(self, request, sociallogin):
-        from_page = request.GET.get('from', 'login')
-
         if sociallogin.is_existing:
-            if from_page == 'signup':
-                messages.info(
-                    request,
-                    'You already have an account. Please log in instead of signing up.'
-                )
-                raise ImmediateHttpResponse(
-                    redirect('login')
-                )
             self._log_social_login(sociallogin.user, request)
             return
 
         email = sociallogin.account.extra_data.get('email', '').lower()
         if email:
             User = get_user_model()
-            if User.objects.filter(email=email).exists():
-                messages.error(
-                    request,
-                    'This email is already registered. Please log in with your password or use a different Google account to sign up.'
-                )
-                raise ImmediateHttpResponse(
-                    redirect('login')
-                )
+            try:
+                user = User.objects.get(email=email)
+                sociallogin.connect(request, user)
+                self._log_social_login(user, request)
+            except User.DoesNotExist:
+                pass
 
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form=form)
