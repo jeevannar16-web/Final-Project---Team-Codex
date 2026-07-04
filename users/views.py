@@ -1,6 +1,7 @@
 """User registration, login, and profile views."""
 
 import logging
+import threading
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
@@ -88,21 +89,23 @@ class CustomPasswordResetDoneView(PasswordResetDoneView):
 def _send_welcome_email(user):
     if not user.email:
         return
-    try:
-        ctx = {
-            'username': user.username,
-            'base_url': settings.BASE_URL,
-            'current_year': timezone.now().year,
-        }
-        html = render_to_string('users/welcome_email.html', ctx)
-        text = render_to_string('users/welcome_email.txt', ctx)
-        subject = render_to_string('users/welcome_subject.txt', ctx).strip()
-        send_mail(subject, text, settings.DEFAULT_FROM_EMAIL, [user.email],
-                  html_message=html)
-        logger.info('Welcome email sent to %s | backend=%s', user.email, settings.EMAIL_BACKEND)
-    except Exception as e:
-        logger.error('Welcome email FAILED to %s | backend=%s error=%s',
-                     user.email, settings.EMAIL_BACKEND, e)
+    def _send():
+        try:
+            ctx = {
+                'username': user.username,
+                'base_url': settings.BASE_URL,
+                'current_year': timezone.now().year,
+            }
+            html = render_to_string('users/welcome_email.html', ctx)
+            text = render_to_string('users/welcome_email.txt', ctx)
+            subject = render_to_string('users/welcome_subject.txt', ctx).strip()
+            send_mail(subject, text, settings.DEFAULT_FROM_EMAIL, [user.email],
+                      html_message=html)
+            logger.info('Welcome email sent to %s | backend=%s', user.email, settings.EMAIL_BACKEND)
+        except Exception as e:
+            logger.error('Welcome email FAILED to %s | backend=%s error=%s',
+                         user.email, settings.EMAIL_BACKEND, e)
+    threading.Thread(target=_send, daemon=True).start()
 
 
 def register(request):

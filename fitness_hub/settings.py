@@ -208,6 +208,7 @@ if sendgrid_key:
     EMAIL_HOST_USER = 'apikey'
     EMAIL_HOST_PASSWORD = sendgrid_key
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'jeevannar16@gmail.com')
+    EMAIL_TIMEOUT = 10
     print(f'[SendGrid] SMTP configured — sending from {DEFAULT_FROM_EMAIL}', flush=True)
 else:
     print(f'[SendGrid] NOT configured — using {EMAIL_BACKEND}', flush=True)

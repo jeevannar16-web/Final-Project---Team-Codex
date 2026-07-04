@@ -15,29 +15,23 @@
     loaded = true;
     bar.classList.remove('active');
     if (logo) logo.classList.remove('active');
+    if (timer) { clearTimeout(timer); timer = null; }
   }
   function showDelayed(delay) {
     if (timer) clearTimeout(timer);
     timer = setTimeout(function() {
       if (!loaded) show();
-    }, delay || 200);
+    }, delay || 500);
   }
 
   if (document.readyState === 'loading') {
-    showDelayed(300);
+    showDelayed(500);
   }
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(hide, 200);
   });
   window.addEventListener('load', function () {
     hide();
-  });
-  window.addEventListener('beforeunload', function() {
-    loaded = false;
-    show();
-  });
-  window.addEventListener('pageshow', function (e) {
-    if (e.persisted) { loaded = false; setTimeout(hide, 250); }
   });
 
   setTimeout(function() {
@@ -52,14 +46,14 @@
     if (link.hasAttribute('download') || link.target === '_blank') return;
     if (!(h.startsWith('/') || h.startsWith(window.location.origin))) return;
     loaded = false;
-    show();
+    showDelayed(500);
   });
 
   document.addEventListener('submit', function (e) {
     if (e.defaultPrevented) return;
     if (e.target.getAttribute('data-no-loader') === 'true') return;
     loaded = false;
-    show();
+    showDelayed(500);
   });
 
   function verifyOnline() {
