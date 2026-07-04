@@ -45,7 +45,6 @@ class EmailVerificationService:
             'expires_in': '15 minutes',
             'base_url': settings.BASE_URL,
         }
-        html_message = render_to_string('verification/email_otp.html', context)
         text_message = (
             f'Your verification code is: {verification.otp}\n'
             f'Or click: {settings.BASE_URL or "http://localhost:8000"}'
@@ -58,7 +57,6 @@ class EmailVerificationService:
                 message=text_message,
                 from_email=settings.DEFAULT_FROM_EMAIL or 'noreply@fitnesshub.com',
                 recipient_list=[verification.email],
-                html_message=html_message,
                 fail_silently=False,
             )
             logger.info(
