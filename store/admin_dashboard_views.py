@@ -46,7 +46,7 @@ def admin_dashboard(request):
 
     recent_favorites = FavoriteItem.objects.select_related('user', 'product').order_by('-created_at')[:10]
     recent_cart_items = CartItem.objects.select_related('user', 'product').order_by('-added_at')[:10]
-    recent_users = User.objects.all().select_related('profile').order_by('-date_joined')[:10]
+    recent_users = User.objects.exclude(profile__isnull=True).select_related('profile').order_by('-date_joined')[:10]
 
     if request.method == 'POST':
         action = request.POST.get('action')

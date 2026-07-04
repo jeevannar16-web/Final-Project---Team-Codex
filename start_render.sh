@@ -119,6 +119,10 @@ for entry in dupes:
         EmailVerification.objects.filter(user=dup).update(user=primary)
         dup.delete()
         print(f'  Deleted user id={dup.id} ({dup.username})')
+# Ensure every remaining user has a Profile
+for u in User.objects.filter(profile__isnull=True):
+    Profile.objects.create(user=u)
+    print(f'  Created missing profile for user id={u.id} ({u.username})')
 print('User deduplication complete')
 " 2>&1
 
