@@ -292,9 +292,5 @@ function updateDeliveryTotal() {
   var grandTotal = totalAmount + charge - discount;
   if (grandEl) grandEl.textContent = '$' + grandTotal.toFixed(2);
 }
-document.getElementById('checkout-form')?.addEventListener('submit', function () {
-  const btn = document.getElementById('place-order-btn');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loader-ring-sm"></span> {{ 'Processing...'|t }}'; }
-});
 </script>
 {% endblock %}

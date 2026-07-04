@@ -47,6 +47,7 @@
   });
 
   document.addEventListener('submit', function (e) {
+    if (e.defaultPrevented) return;
     if (e.target.getAttribute('data-no-loader') === 'true') return;
     loaded = false;
     show();

@@ -22,7 +22,7 @@
 
 
 
-    <form method="POST" class="login-form" action="{% url 'login' %}">
+    <form method="POST" class="login-form" action="{% url 'login' %}" data-no-loader="true">
       {% csrf_token %}
       {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
       <div class="field">

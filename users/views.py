@@ -322,5 +322,4 @@ def user_logout(request):
     except Exception:
         pass
     logout(request)
-    django_messages.success(request, "You have been logged out successfully.")
     return redirect('home')
