@@ -197,10 +197,18 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@fitnesshub.com')
+EMAIL_TIMEOUT = 10
 
-# Auto-configure SendGrid if SENDGRID_API_KEY is set
+# Auto-configure SMTP in order of preference:
+# 1) Explicit EMAIL_HOST_USER/PASSWORD (e.g. Gmail SMTP) — best deliverability for @gmail.com
+# 2) SENDGRID_API_KEY — works with verified custom domain
+# 3) Console backend (logs only)
+
 sendgrid_key = os.environ.get('SENDGRID_API_KEY', '')
-if sendgrid_key:
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    print(f'[SMTP] Custom SMTP configured — host={EMAIL_HOST} user={EMAIL_HOST_USER} from={DEFAULT_FROM_EMAIL}', flush=True)
+elif sendgrid_key:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = 'smtp.sendgrid.net'
     EMAIL_PORT = 587
@@ -208,10 +216,9 @@ if sendgrid_key:
     EMAIL_HOST_USER = 'apikey'
     EMAIL_HOST_PASSWORD = sendgrid_key
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'jeevannar16@gmail.com')
-    EMAIL_TIMEOUT = 10
     print(f'[SendGrid] SMTP configured — sending from {DEFAULT_FROM_EMAIL}', flush=True)
 else:
-    print(f'[SendGrid] NOT configured — using {EMAIL_BACKEND}', flush=True)
+    print(f'[SMTP] No credentials — using {EMAIL_BACKEND}', flush=True)
 
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8000')
 PASSWORD_RESET_TIMEOUT = 300
