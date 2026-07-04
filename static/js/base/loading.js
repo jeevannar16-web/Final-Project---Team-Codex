@@ -27,6 +27,9 @@
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(hide, 400);
   });
+  window.addEventListener('load', function () {
+    setTimeout(hide, 200);
+  });
   window.addEventListener('beforeunload', function() {
     loaded = false;
     show();
@@ -34,6 +37,10 @@
   window.addEventListener('pageshow', function (e) {
     if (e.persisted) { loaded = false; setTimeout(hide, 250); }
   });
+
+  setTimeout(function() {
+    if (!loaded) hide();
+  }, 5000);
 
   document.addEventListener('click', function (e) {
     var link = e.target.closest('a[href]');
