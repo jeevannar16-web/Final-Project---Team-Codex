@@ -23,12 +23,14 @@
     }, delay || 200);
   }
 
-  if (document.readyState === 'loading') show();
+  if (document.readyState === 'loading') {
+    showDelayed(300);
+  }
   document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(hide, 400);
+    setTimeout(hide, 200);
   });
   window.addEventListener('load', function () {
-    setTimeout(hide, 200);
+    hide();
   });
   window.addEventListener('beforeunload', function() {
     loaded = false;
@@ -40,7 +42,7 @@
 
   setTimeout(function() {
     if (!loaded) hide();
-  }, 5000);
+  }, 3000);
 
   document.addEventListener('click', function (e) {
     var link = e.target.closest('a[href]');
