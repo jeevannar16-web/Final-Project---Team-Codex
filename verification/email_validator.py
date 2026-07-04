@@ -34,6 +34,8 @@ def _check_mx(domain):
 
 SERVICES = []
 
+_skip_validation = False
+
 
 def _register_service(name, check_fn):
     SERVICES.append((name, check_fn))

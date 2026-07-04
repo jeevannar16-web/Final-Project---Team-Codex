@@ -200,15 +200,17 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@fitnesshub.com')
 EMAIL_TIMEOUT = 5
 
-# Auto-configure SMTP in order of preference:
-# 1) Explicit EMAIL_HOST_USER/PASSWORD (e.g. Gmail SMTP) — best deliverability for @gmail.com
-# 2) SENDGRID_API_KEY — works with verified custom domain
+# Auto-configure email in order of preference:
+# 1) Explicit EMAIL_HOST_USER/PASSWORD (e.g. Gmail SMTP)
+# 2) SENDGRID_API_KEY — HTTP API fallback (works on Render free tier)
 # 3) Console backend (logs only)
 
 sendgrid_key = os.environ.get('SENDGRID_API_KEY', '')
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    print(f'[SMTP] Custom SMTP configured — host={EMAIL_HOST} user={EMAIL_HOST_USER} from={DEFAULT_FROM_EMAIL}', flush=True)
+    EMAIL_BACKEND = 'fitness_hub.email_backend.ResilientEmailBackend'
+    print(f'[Email] Resilient backend — SMTP host={EMAIL_HOST} user={EMAIL_HOST_USER} from={DEFAULT_FROM_EMAIL}', flush=True)
+    if sendgrid_key:
+        print(f'[Email] SendGrid API fallback available', flush=True)
 elif sendgrid_key:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = 'smtp.sendgrid.net'
@@ -217,9 +219,9 @@ elif sendgrid_key:
     EMAIL_HOST_USER = 'apikey'
     EMAIL_HOST_PASSWORD = sendgrid_key
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'jeevannar16@gmail.com')
-    print(f'[SendGrid] SMTP configured — sending from {DEFAULT_FROM_EMAIL}', flush=True)
+    print(f'[Email] SendGrid SMTP configured — sending from {DEFAULT_FROM_EMAIL}', flush=True)
 else:
-    print(f'[SMTP] No credentials — using {EMAIL_BACKEND}', flush=True)
+    print(f'[Email] No credentials — using {EMAIL_BACKEND}', flush=True)
 
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8000')
 PASSWORD_RESET_TIMEOUT = 300

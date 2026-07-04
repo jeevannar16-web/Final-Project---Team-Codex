@@ -32,7 +32,6 @@ class EmailVerificationService:
 
         EmailVerificationService._send_otp_email(verification)
         logger.info(f'Verification email sent to {target_email}')
-
         return verification
 
     @staticmethod
@@ -75,7 +74,6 @@ class EmailVerificationService:
                 verification.email,
                 e,
             )
-            raise
 
     @staticmethod
     def verify_otp(user, otp):
@@ -129,4 +127,5 @@ class EmailVerificationService:
             verification = EmailVerificationService.create_and_send(user, target_email)
             return True, verification
         except Exception as e:
-            return False, f'Failed to send: {e}'
+            logger.error('Failed to send verification email to %s: %s', target_email, e)
+            return False, 'Email service temporarily unavailable. Please try again later.'
