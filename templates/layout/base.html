@@ -8,6 +8,8 @@
   <script>(function(){var t=localStorage.getItem('fitnesshub_theme');if(t&&t!=='system'&&t!=='obsidian'){document.documentElement.setAttribute('data-global-theme',t)}})()</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  {% load static %}
+  {% load store_extras %}
   <title>{% block title %}FITNESS HUB{% endblock %}</title>
   <meta name="description" content="{% block meta_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop curated workout equipment, activewear, and supplements for every body.{% endblock %}">
 
@@ -50,8 +52,6 @@
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap"></noscript>
   <noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></noscript>
 
-  {% load static %}
-  {% load store_extras %}
   <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpg' %}">
   <!-- Head: Base CSS -->
   <link rel="stylesheet" href="{% static 'css/base/loading.css' %}?v=7">
