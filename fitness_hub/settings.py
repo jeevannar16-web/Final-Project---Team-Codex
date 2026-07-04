@@ -206,9 +206,9 @@ EMAIL_TIMEOUT = 5
 # 3) SENDGRID_API_KEY — HTTP API fallback
 # 4) Console backend (logs only)
 
-sendgrid_key = os.environ.get('SENDGRID_API_KEY', '')
+sendgrid_key = os.environ.get('SENDGRID_API_KEY', '').strip()
 SENDGRID_API_KEY = sendgrid_key
-brevo_key = os.environ.get('BREVO_API_KEY', '')
+brevo_key = os.environ.get('BREVO_API_KEY', '').strip()
 BREVO_API_KEY = brevo_key
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = 'fitness_hub.email_backend.ResilientEmailBackend'

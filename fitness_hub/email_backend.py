@@ -30,7 +30,7 @@ class ResilientEmailBackend(SMTPBackend):
         return sent
 
     def _try_brevo(self, message):
-        brevo_key = getattr(settings, 'BREVO_API_KEY', '')
+        brevo_key = getattr(settings, 'BREVO_API_KEY', '').strip()
         if not brevo_key:
             return False
         try:
@@ -69,7 +69,7 @@ class ResilientEmailBackend(SMTPBackend):
             return False
 
     def _try_sendgrid(self, message):
-        sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', '')
+        sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', '').strip()
         if not sendgrid_key:
             return False
         try:
