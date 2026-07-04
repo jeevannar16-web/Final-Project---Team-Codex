@@ -37,11 +37,13 @@ class CustomPasswordResetForm(PasswordResetForm):
         return email
 
     def get_users(self, email):
-        """Include social-auth users (no usable password) so they can set one."""
-        active_users = User.objects.filter(
+        """Return at most 1 user per email to prevent duplicate sends."""
+        user = User.objects.filter(
             email__iexact=email, is_active=True
-        )
-        return (u for u in active_users)
+        ).order_by('-is_superuser', '-is_staff', 'date_joined').first()
+        if user:
+            return (user,)
+        return ()
 
     def send_mail(self, subject_template_name, email_template_name, context,
                   from_email, to_email, html_email_template_name=None):
@@ -69,7 +71,7 @@ class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm
     template_name = 'users/password_reset.html'
     email_template_name = 'users/password_reset_email.txt'
-    html_email_template_name = None
+    html_email_template_name = 'users/password_reset_email.html'
     subject_template_name = 'users/password_reset_subject.txt'
 
     def form_valid(self, form):
@@ -105,9 +107,11 @@ def _send_welcome_email(user):
                 'base_url': settings.BASE_URL,
                 'current_year': timezone.now().year,
             }
+            html = render_to_string('users/welcome_email.html', ctx)
             text = render_to_string('users/welcome_email.txt', ctx)
             subject = render_to_string('users/welcome_subject.txt', ctx).strip()
-            send_mail(subject, text, settings.DEFAULT_FROM_EMAIL, [user.email])
+            send_mail(subject, text, settings.DEFAULT_FROM_EMAIL, [user.email],
+                      html_message=html)
             logger.info('Welcome email sent to %s | backend=%s', user.email, settings.EMAIL_BACKEND)
         except Exception as e:
             logger.error('Welcome email FAILED to %s | backend=%s error=%s',

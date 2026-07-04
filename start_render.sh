@@ -53,6 +53,75 @@ else:
 # --- Restore images from fixture ---
 python manage.py fix_product_images 2>&1 || echo "Image restoration skipped (non-fatal)"
 
+# --- Deduplicate users (keep superuser/staff, delete rest) ---
+python -c "
+import django, os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fitness_hub.settings')
+django.setup()
+from django.contrib.auth.models import User
+from django.db.models import Count
+from store.models import Product, CartItem, Order, FavoriteItem, Review, ActivityLog, UserOnline, Conversation, Message, BlockedUser, ReportedUser
+from users.models import Profile, CredentialHistory
+from verification.models import EmailVerification
+
+dupes = User.objects.values('email').annotate(count=Count('id')).filter(count__gt=1, email__gt='')
+for entry in dupes:
+    email = entry['email']
+    users = User.objects.filter(email__iexact=email).order_by('-is_superuser', '-is_staff', 'date_joined')
+    primary = users.first()
+    for dup in users[1:]:
+        print(f'  Merging user id={dup.id} ({dup.username}) into id={primary.id} ({primary.username})')
+        # Reassign or remove related objects to avoid FK violations
+        # Profile (OneToOne)
+        if hasattr(dup, 'profile'):
+            if hasattr(primary, 'profile'):
+                dup.profile.delete()
+            else:
+                dup.profile.user = primary
+                dup.profile.save()
+        # CredentialHistory
+        CredentialHistory.objects.filter(user=dup).update(user=primary)
+        # CartItem
+        CartItem.objects.filter(user=dup).update(user=primary)
+        # Order
+        Order.objects.filter(user=dup).update(user=primary)
+        # FavoriteItem - skip duplicates
+        for fav in FavoriteItem.objects.filter(user=dup):
+            if not FavoriteItem.objects.filter(user=primary, product=fav.product).exists():
+                fav.user = primary
+                fav.save()
+            else:
+                fav.delete()
+        # Review - skip duplicates
+        for r in Review.objects.filter(user=dup):
+            if not Review.objects.filter(user=primary, product=r.product).exists():
+                r.user = primary
+                r.save()
+            else:
+                r.delete()
+        # ActivityLog (SET_NULL) - just leave null
+        # UserOnline (OneToOne)
+        if hasattr(dup, 'online_status'):
+            dup.online_status.delete()
+        # Product.seller (nullable) - reassign
+        Product.objects.filter(seller=dup).update(seller=primary)
+        # Conversation
+        Conversation.objects.filter(customer=dup).update(customer=primary)
+        Conversation.objects.filter(seller=dup).update(seller=primary)
+        # Message
+        Message.objects.filter(sender=dup).update(sender=primary)
+        # BlockedUser
+        BlockedUser.objects.filter(blocker=dup).update(blocker=primary)
+        BlockedUser.objects.filter(blocked=dup).update(blocked=primary)
+        # ReportedUser
+        ReportedUser.objects.filter(reported_by=dup).update(reported_by=primary)
+        # EmailVerification
+        EmailVerification.objects.filter(user=dup).update(user=primary)
+        dup.delete()
+        print(f'  Deleted user id={dup.id} ({dup.username})')
+print('User deduplication complete')
+" 2>&1
+
 # Auto-setup script (ensures superuser, Site, and SocialApp exist)
 python -c "
 import django, os
