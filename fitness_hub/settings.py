@@ -197,6 +197,17 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@fitnesshub.com')
+
+# Auto-configure SendGrid if SENDGRID_API_KEY is set
+sendgrid_key = os.environ.get('SENDGRID_API_KEY', '')
+if sendgrid_key:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'apikey'
+    EMAIL_HOST_PASSWORD = sendgrid_key
+
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8000')
 PASSWORD_RESET_TIMEOUT = 300
 
