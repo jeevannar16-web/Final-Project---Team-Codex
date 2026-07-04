@@ -1,5 +1,7 @@
 """User registration, login, and profile views."""
 
+import logging
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -21,6 +23,8 @@ from store.models import Order, FavoriteItem, UserOnline
 from store.activity_logger import log_action
 from verification.email_validator import validate_email_deliverability
 
+logger = logging.getLogger(__name__)
+
 
 # AUTHENTICANTION
 
@@ -41,8 +45,14 @@ class CustomPasswordResetForm(PasswordResetForm):
     def send_mail(self, subject_template_name, email_template_name, context,
                   from_email, to_email, html_email_template_name=None):
         context['current_year'] = timezone.now().year
-        super().send_mail(subject_template_name, email_template_name, context,
-                          from_email, to_email, html_email_template_name=html_email_template_name)
+        try:
+            super().send_mail(subject_template_name, email_template_name, context,
+                              from_email, to_email, html_email_template_name=html_email_template_name)
+            logger.info('Password reset email sent to %s | backend=%s', to_email, settings.EMAIL_BACKEND)
+        except Exception as e:
+            logger.error('Password reset email FAILED to %s | backend=%s error=%s',
+                         to_email, settings.EMAIL_BACKEND, e)
+            raise
 
 
 class CustomPasswordResetView(PasswordResetView):
@@ -89,8 +99,10 @@ def _send_welcome_email(user):
         subject = render_to_string('users/welcome_subject.txt', ctx).strip()
         send_mail(subject, text, settings.DEFAULT_FROM_EMAIL, [user.email],
                   html_message=html)
-    except Exception:
-        pass  # welcome email is best-effort
+        logger.info('Welcome email sent to %s | backend=%s', user.email, settings.EMAIL_BACKEND)
+    except Exception as e:
+        logger.error('Welcome email FAILED to %s | backend=%s error=%s',
+                     user.email, settings.EMAIL_BACKEND, e)
 
 
 def register(request):
@@ -307,8 +319,11 @@ class CustomPasswordChangeView(auth_views.PasswordChangeView):
                 subject = render_to_string('users/password_changed_subject.txt', ctx).strip()
                 send_mail(subject, text, settings.DEFAULT_FROM_EMAIL,
                           [self.request.user.email], html_message=html)
-            except Exception:
-                pass
+                logger.info('Password change email sent to %s | backend=%s',
+                            self.request.user.email, settings.EMAIL_BACKEND)
+            except Exception as e:
+                logger.error('Password change email FAILED to %s | backend=%s error=%s',
+                             self.request.user.email, settings.EMAIL_BACKEND, e)
         messages.success(self.request, "Password changed successfully!")
         return resp
 

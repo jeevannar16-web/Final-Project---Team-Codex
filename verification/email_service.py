@@ -52,20 +52,30 @@ class EmailVerificationService:
             f'/verify/email/{verification.token}/\n'
             f'Expires in 15 minutes.'
         )
-        send_mail(
-            subject=subject,
-            message=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL or 'noreply@fitnesshub.com',
-            recipient_list=[verification.email],
-            html_message=html_message,
-            fail_silently=False,
-        )
-        logger.info(
-            'Email sent | backend=%s from=%s to=%s',
-            settings.EMAIL_BACKEND,
-            settings.DEFAULT_FROM_EMAIL,
-            verification.email,
-        )
+        try:
+            send_mail(
+                subject=subject,
+                message=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL or 'noreply@fitnesshub.com',
+                recipient_list=[verification.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            logger.info(
+                'OTP email sent | backend=%s from=%s to=%s',
+                settings.EMAIL_BACKEND,
+                settings.DEFAULT_FROM_EMAIL,
+                verification.email,
+            )
+        except Exception as e:
+            logger.error(
+                'OTP email FAILED | backend=%s from=%s to=%s error=%s',
+                settings.EMAIL_BACKEND,
+                settings.DEFAULT_FROM_EMAIL,
+                verification.email,
+                e,
+            )
+            raise
 
     @staticmethod
     def verify_otp(user, otp):

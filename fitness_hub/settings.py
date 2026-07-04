@@ -208,6 +208,9 @@ if sendgrid_key:
     EMAIL_HOST_USER = 'apikey'
     EMAIL_HOST_PASSWORD = sendgrid_key
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'jeevannar16@gmail.com')
+    print(f'[SendGrid] SMTP configured — sending from {DEFAULT_FROM_EMAIL}', flush=True)
+else:
+    print(f'[SendGrid] NOT configured — using {EMAIL_BACKEND}', flush=True)
 
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8000')
 PASSWORD_RESET_TIMEOUT = 300
@@ -251,6 +254,10 @@ LOGGING = {
     },
     'loggers': {
         'verification': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'users.views': {
             'handlers': ['console'],
             'level': 'INFO',
         },
