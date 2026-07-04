@@ -44,7 +44,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def handler500(request):
-    logger.error('500 error on %s %s', request.method, request.path)
+    logger.error('500 error on %s %s (handler500 fallback)', request.method, request.path)
     return HttpResponse("""
 <!DOCTYPE html><html><head><title>Server Error — FITNESS HUB</title>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
