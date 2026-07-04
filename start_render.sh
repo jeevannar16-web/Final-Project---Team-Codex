@@ -60,7 +60,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fitness_hub.settings')
 django.setup()
 from django.contrib.auth.models import User
 from django.db.models import Count
-from store.models import Product, CartItem, Order, FavoriteItem, Review, ActivityLog, UserOnline, Conversation, Message, BlockedUser, ReportedUser
+from store.models import Product, CartItem, Order, FavoriteItem, Review, ActivityLog, UserOnline, Conversation, Message, BlockedUser, MessageReport
 from users.models import Profile, CredentialHistory
 from verification.models import EmailVerification
 
@@ -113,8 +113,8 @@ for entry in dupes:
         # BlockedUser
         BlockedUser.objects.filter(blocker=dup).update(blocker=primary)
         BlockedUser.objects.filter(blocked=dup).update(blocked=primary)
-        # ReportedUser
-        ReportedUser.objects.filter(reported_by=dup).update(reported_by=primary)
+        # MessageReport
+        MessageReport.objects.filter(reported_by=dup).update(reported_by=primary)
         # EmailVerification
         EmailVerification.objects.filter(user=dup).update(user=primary)
         dup.delete()
