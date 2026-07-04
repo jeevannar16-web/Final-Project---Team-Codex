@@ -8,11 +8,13 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from .sitemaps import StaticViewSitemap
+from .sitemaps import StaticViewSitemap, ProductSitemap, CategorySitemap
 
 
 sitemaps = {
     'static': StaticViewSitemap,
+    'products': ProductSitemap,
+    'categories': CategorySitemap,
 }
 
 

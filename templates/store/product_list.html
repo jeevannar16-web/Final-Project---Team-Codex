@@ -5,6 +5,10 @@
 {% load static %}
 {% load store_extras %}
 
+{% block title %}{{ 'Product Catalog'|t }} — FITNESS HUB{% endblock %}
+{% block meta_desc %}Browse {{ products|length }}+ fitness products at FITNESS HUB. Filter by category, size, and price. Find the perfect gear for your workout.{% endblock %}
+{% block og_title %}{{ 'Product Catalog'|t }} — FITNESS HUB{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/product_list.css' %}">
 {% endblock %}

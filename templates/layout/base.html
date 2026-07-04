@@ -9,6 +9,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{% block title %}FITNESS HUB{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop our curated collection of workout equipment, activewear, and supplements.{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}FITNESS HUB — Premium Fitness Gear{% endblock %}">
+  <meta property="og:description" content="{% block og_desc %}Premium fitness gear and sportswear at FITNESS HUB. Shop our curated collection of workout equipment, activewear, and supplements.{% endblock %}">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:site_name" content="FITNESS HUB">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}FITNESS HUB{% endblock %}">
+  <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
 
   <!-- Head: Fonts, Icons, Leaflet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +45,7 @@
   <link rel="stylesheet" href="{% static 'css/base/map_common.css' %}?v=7">
   <link rel="stylesheet" href="{% static 'css/base/search.css' %}?v=7">
   {% block extra_css %}{% endblock %}
+  {% block extra_head %}{% endblock %}
 
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}?v=1">
   <meta name="google-site-verification" content="2wT_X2-2qsBMBWZmfKlyqLbfqqYbG-SRG3tRTdjr22A" />

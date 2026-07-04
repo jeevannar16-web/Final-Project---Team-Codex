@@ -5,8 +5,34 @@
 {% load store_extras %}
 {% load static %}
 
+{% block title %}{{ product.name|t }} — FITNESS HUB{% endblock %}
+{% block meta_desc %}{{ product.name|t }} — {% if product.is_sale %}${{ product.sale_price }}{% else %}${{ product.price }}{% endif %}. {{ product.description|t|truncatechars:160 }}{% endblock %}
+{% block og_title %}{{ product.name|t }} — FITNESS HUB{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_desc %}{{ product.description|t|truncatechars:200 }}{% endblock %}
+{% block twitter_title %}{{ product.name|t }} — FITNESS HUB{% endblock %}
+{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/product_detail.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.name|t|escapejs }}",
+  "description": "{{ product.description|t|escapejs }}",
+  "image": "{{ product.image|img_url:'600x600' }}",
+  "offers": {
+    "@type": "Offer",
+    "price": "{% if product.is_sale %}{{ product.sale_price }}{% else %}{{ product.price }}{% endif %}",
+    "priceCurrency": "USD",
+    "availability": "{% if product.stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+  }
+}
+</script>
 {% endblock %}
 
 {% block content %}
