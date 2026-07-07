@@ -27,12 +27,19 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def on_authentication_error(self, request, provider, error=None, exception=None, extra_context=None):
+        path = request.path if request else '?'
+        session_key = request.session.session_key if request and request.session else '?'
         logger.error(
-            "Social login failed | provider=%s error=%s exception=%r\n%s",
+            "Social login failed | provider=%s error=%s exception=%r path=%s session=%s\n%s",
             provider.id if provider else '?', error, exception,
+            path, session_key,
             traceback.format_exc()
         )
-        # Silent redirect — user can retry
+        if request and request.session:
+            for k in list(request.session.keys()):
+                if 'socialaccount' in k or 'state' in k:
+                    del request.session[k]
+            request.session.save()
         raise ImmediateHttpResponse(redirect('login'))
 
     def _log_social_login(self, user, request):
