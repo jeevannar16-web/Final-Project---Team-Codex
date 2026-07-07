@@ -3,11 +3,14 @@
 import logging
 import traceback
 import functools
+import json
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.http import HttpResponseServerError
+from django.http import HttpResponseServerError, HttpResponse
+from django.core.management import call_command
+from io import StringIO
 
 logger = logging.getLogger(__name__)
 from django.db.models import Sum, Count, Q
@@ -509,3 +512,13 @@ def admin_manage_subscribers(request):
         'total_count': NewsletterSubscriber.objects.count(),
     }
     return render(request, 'store/admin_manage_subscribers.html', context)
+
+
+@staff_member_required
+def admin_export_db(request):
+    buf = StringIO()
+    call_command('dumpdata', '--natural-foreign', '--indent', '2', stdout=buf)
+    data = buf.getvalue()
+    response = HttpResponse(data, content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="fitnesshub_export.json"'
+    return response

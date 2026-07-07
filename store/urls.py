@@ -89,4 +89,5 @@ urlpatterns = [
     path('newsletter/unsubscribe/<str:token>/', views.newsletter_unsubscribe, name='newsletter_unsubscribe'),
     path('admin-dashboard/newsletter/broadcast/', admin_dashboard_views.admin_newsletter_broadcast, name='admin_newsletter_broadcast'),
     path('admin-dashboard/newsletter/subscribers/', admin_dashboard_views.admin_manage_subscribers, name='admin_manage_subscribers'),
+    path('admin-dashboard/export/', admin_dashboard_views.admin_export_db, name='admin_export_db'),
 ]
