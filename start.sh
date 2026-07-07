@@ -29,6 +29,20 @@ fi
 echo ""
 echo "  Applying migrations..."
 python manage.py migrate 2>&1 | tail -3
+
+# Build static files manifest if missing
+if [ ! -f staticfiles/staticfiles.json ]; then
+  echo "  Building static files..."
+  python manage.py collectstatic --no-input --quiet 2>&1 | tail -1
+fi
+
+# Load seed data if database is empty (no products)
+PRODUCT_COUNT=$(python manage.py shell -c "from store.models import Product; print(Product.objects.count())" 2>/dev/null)
+if [ "$PRODUCT_COUNT" = "0" ] || [ -z "$PRODUCT_COUNT" ]; then
+  echo "  Loading seed data (446 products)..."
+  python manage.py loaddata fixtures/seed_data.json --quiet 2>&1 | tail -1
+fi
+
 echo ""
 echo "  Starting server..."
 echo ""
