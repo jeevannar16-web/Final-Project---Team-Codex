@@ -89,6 +89,21 @@ Windows: `start.bat`
 
 ---
 
+## Database
+
+### Development (SQLite)
+Default — no setup needed. Database file `db.sqlite3` is gitignored.
+
+### Production (Neon PostgreSQL)
+Migrate from Render PostgreSQL (expires after 90 days) to Neon (free, no expiration): 
+
+1. Export data from running site: visit `/admin-dashboard/export/` as admin
+2. Create free database at console.neon.tech
+3. Set `DATABASE_URL` in Render env vars to the Neon connection string
+4. Deploy — seed data loads automatically from `fixtures/seed_data.json`
+
+---
+
 ## Email Configuration
 
 Emails (welcome, OTP, password reset, order confirmations) use a **resilient multi-backend** system that tries providers in order until one succeeds:
@@ -131,7 +146,7 @@ For Brevo, sign up at brevo.com, create an API key under **SMTP & API → API Ke
 ## Tech Stack
 
 - **Backend:** Django 5.0, Python 3.14
-- **Database:** SQLite (dev) / PostgreSQL (production on Render)
+- **Database:** SQLite (dev) / **Neon PostgreSQL** (production, free, no expiration)
 - **Static files:** Whitenoise (compressed, manifest-based, 1-year cache)
 - **Images:** Cloudinary CDN with auto-resize thumbnails
 - **Auth:** django-allauth (email + Google OAuth)
@@ -140,6 +155,7 @@ For Brevo, sign up at brevo.com, create an API key under **SMTP & API → API Ke
 - **Deployment:** Render (free tier), GitHub Actions (keep-alive + status checks)
 - **Error tracking:** Sentry
 - **CDN:** Cloudflare (optional, at DNS level)
+- **PostgreSQL hosting:** Neon (serverless, 500MB free, never expires)
 
 ---
 
@@ -165,5 +181,18 @@ For Brevo, sign up at brevo.com, create an API key under **SMTP & API → API Ke
 - Themes use CSS custom properties with session storage
 - Maps use Leaflet — no API key, completely free
 - All API keys sourced from `.env` only; no hardcoded secrets
-- Python 3.14 broke Django's `BaseContext.__copy__` — monkey-patched in `fitness_hub/__init__.py` via `object.__new__`
-- Email uses resilient multi-backend (`ResilientEmailBackend`) — tries SMTP, then Brevo API, then SendGrid API, then console; never crashes on failure
+- **Python 3.14** broke Django's `BaseContext.__copy__` — monkey-patched in `fitness_hub/__init__.py` via `object.__new__`. Fixes ALL Django admin 500s.
+- Email uses resilient multi-backend (`ResilientEmailBackend`) — tries Gmail SMTP → Brevo API → SendGrid API → console; never crashes on failure
+- **Database hosted on Neon** (free, 500MB, no expiration) instead of Render PostgreSQL (expires after 90 days)
+- Google OAuth adapter auto-connects existing users by email; stale session state cleared on first-attempt failures
+
+## Troubleshooting
+
+### Google Login Fails on First Attempt
+The social login adapter (`users/allauth_adapter.py`) now clears stale OAuth state on errors and logs detailed diagnostics. If Google login still fails on first try, check Render logs for `Social login failed` messages.
+
+### Email Not Delivering on Render
+Render free tier blocks outbound SMTP (port 587). The `ResilientEmailBackend` automatically falls back to Brevo HTTP API (port 443). Ensure `BREVO_API_KEY` is set in Render env vars.
+
+### Django Admin 500s (Python 3.14)
+If admin pages return 500, the `BaseContext.__copy__` monkey-patch in `fitness_hub/__init__.py` should resolve it. Verify by checking startup logs.
