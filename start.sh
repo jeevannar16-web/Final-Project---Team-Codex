@@ -37,10 +37,10 @@ if [ ! -f staticfiles/staticfiles.json ]; then
 fi
 
 # Load seed data if database is empty (no products)
-PRODUCT_COUNT=$(python manage.py shell -c "from store.models import Product; print(Product.objects.count())" 2>/dev/null)
+PRODUCT_COUNT=$(python manage.py shell -c "from store.models import Product; print(Product.objects.count())" 2>&1)
 if [ "$PRODUCT_COUNT" = "0" ] || [ -z "$PRODUCT_COUNT" ]; then
-  echo "  Loading seed data (446 products)..."
-  python manage.py loaddata fixtures/seed_data.json --quiet 2>&1 | tail -1
+  echo "  Loading seed data (446 products, 77 users, 149 orders)..."
+  python manage.py loaddata fixtures/seed_data.json 2>&1
 fi
 
 echo ""
