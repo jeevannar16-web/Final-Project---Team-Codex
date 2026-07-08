@@ -1,52 +1,30 @@
-/* ==============================================================================
-   File: pages/profile.css
-   Description: User profile page with tabs, orders, favorites, and seller info
-   ============================================================================== */
-
-
-/* ==============================================================================
-   SECTION: Page Wrapper
-   ============================================================================== */
-
-
-
-
 .profile-wrap {
   max-width: 1000px;
   margin: 0 auto;
   padding: 40px 2rem 80px;
 }
 
-/* ==============================================================================
-   SECTION: Header Card
-   ============================================================================== */
-
-
-
 .profile-header-card {
-  background: var(--clr-card);
-  border: 1px solid var(--clr-border);
-  border-radius: var(--radius);
+  background: #121212;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
   padding: 32px;
   display: flex;
   align-items: center;
   gap: 28px;
   margin-bottom: 28px;
+  transition: border-color 0.2s;
 }
-
-/* ==============================================================================
-   SECTION: Avatar
-   ============================================================================== */
-
-
-
+.profile-header-card:hover {
+  border-color: #2a2a2a;
+}
 
 .profile-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: var(--clr-surface);
-  border: 2px solid var(--clr-accent);
+  background: #0e0e0e;
+  border: 2px solid #d4af37;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,16 +45,9 @@
 .profile-avatar .initials {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--clr-accent);
+  color: #d4af37;
   font-family: 'Playfair Display', serif;
 }
-
-/* ==============================================================================
-   SECTION: Edit Button
-   ============================================================================== */
-
-
-
 
 .avatar-edit-btn {
   position: absolute;
@@ -101,44 +72,31 @@
   padding: 8px 0;
 }
 
-/* ==============================================================================
-   SECTION: Profile Info
-   ============================================================================== */
-
-
-
 .profile-header-info h1 {
   margin: 0;
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--clr-text);
+  color: #f0ece4;
   font-family: 'Playfair Display', serif;
-  transition: border-color 0.2s;
   outline: none;
   border-radius: 4px;
 }
 .profile-header-info h1:focus {
-  border-color: var(--clr-accent);
+  border-color: #d4af37;
 }
 .profile-header-info .member-since {
-  color: var(--clr-muted);
+  color: #666;
   font-size: 0.82rem;
   margin: 4px 0 0;
 }
-.profile-header-info .member-since span { color: var(--clr-accent); }
-
-/* ==============================================================================
-   SECTION: Tabs
-   ============================================================================== */
-
-
+.profile-header-info .member-since span { color: #d4af37; }
 
 .profile-tabs {
   display: flex;
   gap: 4px;
-  background: var(--clr-card);
-  border: 1px solid var(--clr-border);
-  border-radius: var(--radius);
+  background: #121212;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
   padding: 6px;
   margin-bottom: 24px;
   overflow-x: auto;
@@ -148,7 +106,7 @@
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--clr-muted);
+  color: #666;
   text-decoration: none;
   transition: all 0.2s;
   white-space: nowrap;
@@ -159,10 +117,10 @@
   align-items: center;
   gap: 6px;
 }
-.profile-tab:hover { color: var(--clr-text); background: var(--clr-surface); }
+.profile-tab:hover { color: #f0ece4; background: #1a1a1a; }
 .profile-tab.active {
   color: #0d0d0d;
-  background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent2));
+  background: linear-gradient(135deg, #d4af37, #c9a032);
 }
 .profile-tab .badge {
   background: rgba(239,68,68,0.2);
@@ -172,13 +130,6 @@
   border-radius: 10px;
   font-weight: 700;
 }
-
-/* ==============================================================================
-   SECTION: Name Edit
-   ============================================================================== */
-
-
-
 
 .name-edit-wrap {
   display: flex;
@@ -190,8 +141,8 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: var(--clr-surface);
-  color: var(--clr-muted);
+  background: #1a1a1a;
+  color: #666;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -201,27 +152,14 @@
   font-size: 0.8rem;
 }
 .name-edit-btn:hover {
-  background: var(--clr-accent);
+  background: #d4af37;
   color: #0d0d0d;
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
-/* ==============================================================================
-   SECTION: Tab Panel
-   ============================================================================== */
-
-
-
-
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
-
-/* ==============================================================================
-   SECTION: Form Grid
-   ============================================================================== */
-
-
 
 .profile-form-grid {
   display: grid;
@@ -230,17 +168,11 @@
 }
 .profile-form-grid .full-width { grid-column: 1 / -1; }
 
-/* ==============================================================================
-   SECTION: Form Fields
-   ============================================================================== */
-
-
-
 .form-field label {
   display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--clr-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
@@ -248,29 +180,46 @@
 .form-field input, .form-field textarea, .form-field select {
   width: 100%;
   padding: 11px 14px;
-  background: var(--clr-surface);
-  border: 1px solid var(--clr-border);
+  background: #0e0e0e;
+  border: 1px solid #1a1a1a;
   border-radius: 8px;
   font-size: 0.9rem;
-  color: var(--clr-text);
+  color: #f0ece4;
   outline: none;
   transition: border-color 0.2s;
 }
 .form-field input:focus, .form-field textarea:focus {
-  border-color: var(--clr-accent);
+  border-color: #d4af37;
 }
 .form-field textarea { resize: vertical; min-height: 80px; }
 
-
-/* ==============================================================================
-   SECTION: Submit Button
-   ============================================================================== */
-
-
-
+.profile-section {
+  background: #121212;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.profile-section .section-hd {
+  padding: 14px 20px;
+  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.profile-section .section-hd h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f0ece4;
+  font-family: 'Playfair Display', serif;
+}
+.profile-section .section-bd {
+  padding: 16px 20px;
+}
 
 .profile-submit-btn {
-  background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent2));
+  background: linear-gradient(135deg, #d4af37, #c9a032);
   color: #0d0d0d;
   border: none;
   padding: 12px 32px;
@@ -283,18 +232,10 @@
 }
 .profile-submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-
-/* ==============================================================================
-   SECTION: Order Card
-   ============================================================================== */
-
-
-
-
 .order-card {
-  background: var(--clr-card);
-  border: 1px solid var(--clr-border);
-  border-radius: var(--radius);
+  background: #121212;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
   padding: 18px 22px;
   margin-bottom: 12px;
   display: flex;
@@ -304,18 +245,10 @@
   gap: 12px;
   transition: border-color 0.2s;
 }
-.order-card:hover { border-color: var(--clr-accent); }
-.order-info h4 { margin: 0 0 4px; font-size: 0.95rem; color: var(--clr-text); }
-.order-info p { margin: 0; color: var(--clr-muted); font-size: 0.82rem; }
-.order-total { font-size: 1.1rem; font-weight: 700; color: var(--clr-accent); }
-
-
-/* ==============================================================================
-   SECTION: Favorites Grid
-   ============================================================================== */
-
-
-
+.order-card:hover { border-color: #d4af37; }
+.order-info h4 { margin: 0 0 4px; font-size: 0.95rem; color: #f0ece4; }
+.order-info p { margin: 0; color: #666; font-size: 0.82rem; }
+.order-total { font-size: 1.1rem; font-weight: 700; color: #d4af37; }
 
 .fav-grid {
   display: grid;
@@ -323,13 +256,13 @@
   gap: 16px;
 }
 .fav-card {
-  background: var(--clr-card);
-  border: 1px solid var(--clr-border);
-  border-radius: var(--radius);
+  background: #121212;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
   overflow: hidden;
   transition: border-color 0.2s, transform 0.2s;
 }
-.fav-card:hover { border-color: var(--clr-accent); transform: translateY(-2px); }
+.fav-card:hover { border-color: #d4af37; transform: translateY(-2px); }
 .fav-card img {
   width: 100%;
   height: 140px;
@@ -337,26 +270,18 @@
   display: block;
 }
 .fav-card-body { padding: 12px 14px; }
-.fav-card-body h4 { margin: 0 0 4px; font-size: 0.85rem; color: var(--clr-text); }
-.fav-card-body .price { color: var(--clr-accent); font-weight: 700; }
-
-
-/* ==============================================================================
-   SECTION: Seller Card
-   ============================================================================== */
-
-
-
+.fav-card-body h4 { margin: 0 0 4px; font-size: 0.85rem; color: #f0ece4; }
+.fav-card-body .price { color: #d4af37; font-weight: 700; }
 
 .seller-card {
-  background: var(--clr-card);
-  border: 1px solid var(--clr-border);
-  border-radius: var(--radius);
+  background: #121212;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
   padding: 32px;
   text-align: center;
 }
-.seller-card h3 { margin: 0 0 8px; color: var(--clr-text); font-family: 'Playfair Display', serif; }
-.seller-card p { color: var(--clr-muted); font-size: 0.9rem; margin: 0 0 20px; }
+.seller-card h3 { margin: 0 0 8px; color: #f0ece4; font-family: 'Playfair Display', serif; }
+.seller-card p { color: #666; font-size: 0.9rem; margin: 0 0 20px; }
 .seller-card .pending-badge {
   display: inline-block;
   background: rgba(245,114,36,0.15);
@@ -369,7 +294,7 @@
 .seller-btn {
   display: inline-block;
   padding: 12px 28px;
-  background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent2));
+  background: linear-gradient(135deg, #d4af37, #c9a032);
   color: #0d0d0d;
   border-radius: 8px;
   font-weight: 700;
@@ -377,14 +302,6 @@
   transition: opacity 0.2s, transform 0.2s;
 }
 .seller-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-
-
-/* ==============================================================================
-   SECTION: Status Badges
-   ============================================================================== */
-
-
-
 
 .status-badge {
   display: inline-block;
@@ -399,27 +316,14 @@
 .status-Delivered { background: rgba(46,196,182,0.15); color: #2ec4b6; }
 .status-Cancelled { background: rgba(239,68,68,0.15); color: #ef4444; }
 
-
-/* ==============================================================================
-   SECTION: Empty List
-   ============================================================================== */
-
-
-
-
 .empty-list {
   text-align: center;
   padding: 48px 20px;
-  color: var(--clr-muted);
+  color: #666;
 }
-.empty-list i { font-size: 2.5rem; display: block; margin-bottom: 12px; color: var(--clr-border); }
-.empty-list a { color: var(--clr-accent); font-weight: 600; text-decoration: none; }
+.empty-list i { font-size: 2.5rem; display: block; margin-bottom: 12px; color: #1a1a1a; }
+.empty-list a { color: #d4af37; font-weight: 600; text-decoration: none; }
 .empty-list a:hover { text-decoration: underline; }
-
-
-/* ==============================================================================
-   SECTION: Responsive
-   ============================================================================== */
 
 @media (max-width: 600px) {
   .profile-form-grid { grid-template-columns: 1fr; }

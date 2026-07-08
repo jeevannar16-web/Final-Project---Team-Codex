@@ -66,6 +66,7 @@ def admin_dashboard(request):
         recent_favorites = FavoriteItem.objects.select_related('user', 'product').order_by('-created_at')[:10]
         recent_cart_items = CartItem.objects.select_related('user', 'product').order_by('-added_at')[:10]
         recent_users = User.objects.exclude(profile__isnull=True).select_related('profile').order_by('-date_joined')[:10]
+        logger.debug('recent_users query returned %d users (last: %s)', len(recent_users), recent_users[0].username if recent_users else 'none')
     except Exception as e:
         logger.error('admin_dashboard data query failed: %s\n%s', e, traceback.format_exc())
         return HttpResponseServerError('Admin dashboard query failed. Check logs.')
