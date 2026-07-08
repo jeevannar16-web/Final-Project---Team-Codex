@@ -6,7 +6,7 @@ import traceback
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.models import SocialAccount, SocialLogin
-from allauth.exceptions import ImmediateHttpResponse
+from allauth.core.exceptions import ImmediateHttpResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -48,18 +48,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
     def pre_social_login(self, request, sociallogin):
         try:
-            if sociallogin.is_existing:
-                self._log_social_login(sociallogin.user, request)
-                return
-
             email = sociallogin.account.extra_data.get('email', '').lower()
             if not email:
                 return
 
             User = get_user_model()
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
+            user = User.objects.filter(email=email).order_by('-is_superuser', '-is_staff', 'date_joined').first()
+            if not user:
                 return
 
             sa, created = SocialAccount.objects.get_or_create(
@@ -70,9 +65,16 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             if not created and sa.user_id != user.id:
                 sa.user = user
                 sa.save()
+
             sociallogin.user = user
             sociallogin.account = sa
             sociallogin.state['process'] = 'login'
+
+            profile = getattr(user, 'profile', None)
+            if profile and not profile.is_email_verified:
+                profile.is_email_verified = True
+                profile.save(update_fields=['is_email_verified'])
+
             self._log_social_login(user, request)
         except Exception as e:
             logger.error('pre_social_login error: %s\n%s', e, traceback.format_exc())
