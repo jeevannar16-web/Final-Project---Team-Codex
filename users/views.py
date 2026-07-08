@@ -160,6 +160,11 @@ def register(request):
                 remembered_data = {'username': username, 'email': ''}
                 request.session['remembered_reg_data'] = remembered_data
                 return render(request, 'users/register.html', {'form': form, 'remembered': remembered_data})
+            if User.objects.filter(email__iexact=email).exists():
+                messages.error(request, "A user with that email address is already registered.")
+                remembered_data = {'username': username, 'email': ''}
+                request.session['remembered_reg_data'] = remembered_data
+                return render(request, 'users/register.html', {'form': form, 'remembered': remembered_data})
 
         if 'remembered_reg_data' in request.session:
             del request.session['remembered_reg_data']
@@ -193,10 +198,14 @@ def user_login(request):
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
         if not username or not password:
-            messages.error(request, "Please enter both username and password.")
+            messages.error(request, "Please enter both username and email.")
             request.session['remembered_username'] = username
             return render(request, 'users/login.html', {'remembered_username': username, 'next': next_url})
         user = authenticate(request, username=username, password=password)
+        if user is None:
+            user_obj = User.objects.filter(email__iexact=username).first()
+            if user_obj:
+                user = authenticate(request, username=user_obj.username, password=password)
         if user is not None:
             if 'remembered_username' in request.session:
                 del request.session['remembered_username']

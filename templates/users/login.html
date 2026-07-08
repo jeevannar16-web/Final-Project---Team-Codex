@@ -26,8 +26,8 @@
       {% csrf_token %}
       {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
       <div class="field">
-        <label for="username">{{ 'Username'|t }}</label>
-        <input type="text" name="username" id="username" placeholder="{{ 'Enter your username'|t }}" value="{{ remembered_username }}" required>
+        <label for="username">{{ 'Username or Email'|t }}</label>
+        <input type="text" name="username" id="username" placeholder="{{ 'Username or Email'|t }}" value="{{ remembered_username }}" required>
       </div>
       <div class="field">
         <label for="password">{{ 'Password'|t }}</label>
