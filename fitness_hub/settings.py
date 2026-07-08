@@ -16,7 +16,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 sentry_sdk.init(
     dsn=os.environ.get('SENTRY_DSN') or None,
     integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
+    traces_sample_rate=0.1,
     send_default_pii=True,
 )
 

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
-from django.views.decorators.cache import cache_page, never_cache
+from django.views.decorators.cache import cache_page, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from ..models import Category, Product, FavoriteItem, Review, OrderItem
 from django.db.models import Count, Avg
@@ -148,6 +148,7 @@ def product_list(request):
 
 
 
+@cache_control(max_age=300, private=True)
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     recommendations = Product.objects.filter(

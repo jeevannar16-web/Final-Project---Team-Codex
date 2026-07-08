@@ -69,6 +69,30 @@ elif connection.vendor == 'postgresql':
 # --- Restore images from fixture ---
 python manage.py fix_product_images 2>&1 || echo "Image restoration skipped (non-fatal)"
 
+# --- Reassign all products to admin and ensure admin is seller ---
+python -c "
+import django, os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fitness_hub.settings')
+django.setup()
+from django.contrib.auth.models import User
+from store.models import Product
+from users.models import Profile
+admin = User.objects.filter(is_superuser=True).order_by('id').first()
+if admin:
+    updated = Product.objects.exclude(seller=admin).update(seller=admin)
+    print(f'Reassigned {updated} products to admin (id={admin.id}, {admin.email})')
+    profile, _ = Profile.objects.get_or_create(user=admin)
+    if not profile.is_seller:
+        profile.is_seller = True
+        profile.seller_requested = True
+        profile.save()
+        print('Admin profile set as seller')
+    seller_count = Profile.objects.filter(is_seller=True).count()
+    print(f'Total sellers in system: {seller_count}')
+else:
+    print('No superuser found for product reassignment')
+" 2>&1
+
 # --- Deduplicate users (keep superuser/staff, delete rest) ---
 python -c "
 import django, os

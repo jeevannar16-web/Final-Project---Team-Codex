@@ -16,14 +16,23 @@ def global_context(request):
 
     user = getattr(request, 'user', None)
     if user and user.is_authenticated:
-        cart_count = CartItem.objects.filter(
-            user=request.user
-        ).aggregate(total=Sum('quantity'))['total'] or 0
-        favorited_ids = list(
-            FavoriteItem.objects.filter(
+        uid = str(user.id)
+        cart_cache_key = 'cart_count_' + uid
+        fav_cache_key = 'fav_ids_' + uid
+        cart_count = cache.get(cart_cache_key)
+        if cart_count is None:
+            cart_count = CartItem.objects.filter(
                 user=request.user
-            ).values_list('product_id', flat=True)
-        )
+            ).aggregate(total=Sum('quantity'))['total'] or 0
+            cache.set(cart_cache_key, cart_count, 60)
+        favorited_ids = cache.get(fav_cache_key)
+        if favorited_ids is None:
+            favorited_ids = list(
+                FavoriteItem.objects.filter(
+                    user=request.user
+                ).values_list('product_id', flat=True)
+            )
+            cache.set(fav_cache_key, favorited_ids, 60)
 
     return {
         'global_categories': categories,

@@ -36,7 +36,7 @@
 
   setTimeout(function() {
     if (!loaded) hide();
-  }, 3000);
+  }, 2000);
 
   document.addEventListener('click', function (e) {
     var link = e.target.closest('a[href]');

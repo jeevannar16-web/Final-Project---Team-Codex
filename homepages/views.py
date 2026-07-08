@@ -5,7 +5,7 @@ import datetime
 from django.shortcuts import render
 from django.db import models
 from django.db.models import Q, Count, Sum
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django.core.cache import cache
 
@@ -16,7 +16,7 @@ from users.models import Profile
 def _home_context(language_code):
     """Compute non-personalized homepage context (cached for 5 min)."""
     base_qs = Product.objects.select_related('category')
-    categories = Category.objects.annotate(pcount=Count('products'))
+    categories = Category.objects.annotate(product_count=Count('products'))
 
     today = datetime.date.today()
     seed = today.toordinal()
@@ -77,7 +77,7 @@ def _home_context(language_code):
         trending = pick_products(base_qs.all(), 12, used_ids)
     mark_used(trending)
 
-    top_cats = categories.order_by('-pcount')[:6]
+    top_cats = categories.order_by('-product_count')[:6]
     category_sections = []
     for cat in top_cats:
         prods = pick_products(base_qs.filter(category=cat), 10, used_ids)
@@ -130,7 +130,7 @@ def _home_context(language_code):
     }
 
 
-@never_cache
+@cache_control(max_age=60, private=True)
 def home(request):
     user = request.user
     query = request.GET.get('q', '').strip()

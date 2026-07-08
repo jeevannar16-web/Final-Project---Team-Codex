@@ -5,7 +5,7 @@
 <html lang="{{ LANGUAGE_CODE|slice:':2' }}" style="color-scheme:only dark;">
 <head>
   <meta name="color-scheme" content="only dark">
-  <script>(function(){var t=localStorage.getItem('fitnesshub_theme');if(t&&t!=='system'&&t!=='obsidian'){document.documentElement.setAttribute('data-global-theme',t)}})()</script>
+  <script>(function(){var t=localStorage.getItem('fitnesshub_theme');if(t&&t!=='system'){document.documentElement.setAttribute('data-global-theme',t)}})()</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   {% load static %}
@@ -54,7 +54,7 @@
 
   <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpg' %}">
   <!-- Head: Combined Base CSS -->
-  <link rel="stylesheet" href="{% static 'css/main.min.css' %}?v=1">
+  <link rel="stylesheet" href="{% static 'css/main.min.css' %}?v=2">
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
   <meta name="google-site-verification" content="2wT_X2-2qsBMBWZmfKlyqLbfqqYbG-SRG3tRTdjr22A" />
@@ -129,8 +129,8 @@
   })();
   </script>
   <!-- Scripts: External JS Files -->
-  <script src="{% static 'js/base/loading.js' %}?v=11"></script>
-  <script src="{% static 'js/main.min.js' %}?v=1" defer></script>
+  <script src="{% static 'js/base/loading.js' %}?v=12"></script>
+  <script src="{% static 'js/main.min.js' %}?v=2" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Scripts: Page-Level Extra JS -->
