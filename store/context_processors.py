@@ -2,11 +2,15 @@
 
 from .models import Product, Category, FavoriteItem, CartItem
 from django.db.models import Sum
+from django.core.cache import cache
 
 
 
 def global_context(request):
-    categories = Category.objects.all()
+    categories = cache.get('global_categories')
+    if categories is None:
+        categories = list(Category.objects.all())
+        cache.set('global_categories', categories, 3600)
     cart_count = 0
     favorited_ids = []
 

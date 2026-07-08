@@ -53,24 +53,10 @@
   <noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></noscript>
 
   <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpg' %}">
-  <!-- Head: Base CSS -->
-  <link rel="stylesheet" href="{% static 'css/base/loading.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/variables.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/reset.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/scrollbar.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/theme.css' %}?v=1">
-  <link rel="stylesheet" href="{% static 'css/base/announcement.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/navigation.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/category_nav.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/messages.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/footer.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/back_to_top.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/map_common.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'css/base/search.css' %}?v=7">
+  <!-- Head: Combined Base CSS -->
+  <link rel="stylesheet" href="{% static 'css/main.min.css' %}?v=1">
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
-
-  <link rel="stylesheet" href="{% static 'css/responsive.css' %}?v=1">
   <meta name="google-site-verification" content="2wT_X2-2qsBMBWZmfKlyqLbfqqYbG-SRG3tRTdjr22A" />
 </head>
 <body>
@@ -143,45 +129,9 @@
   })();
   </script>
   <!-- Scripts: External JS Files -->
-  <script src="{% static 'js/base/theme.js' %}?v=1" defer></script>
-  <script>
-  (function(){
-    var container = document.getElementById('mobile-theme-options');
-    if (!container || !window.__themeData) return;
-    var cur = document.documentElement.getAttribute('data-global-theme') || 'obsidian';
-    __themeData.themes.forEach(function(t){
-      var btn = document.createElement('button');
-      btn.className = 'tp-opt' + (t.id === cur ? ' tp-active' : '');
-      btn.setAttribute('data-theme-id', t.id);
-      btn.innerHTML = '<span class="tp-opt-swatch" style="background:' + t.color + '"></span><span class="tp-opt-icon">' + t.icon + '</span><span class="tp-opt-label">' + t.label + '</span>';
-      btn.addEventListener('click', function(){
-        __themeData.apply(t.id);
-        container.querySelectorAll('.tp-opt').forEach(function(o){ o.classList.remove('tp-active'); });
-        btn.classList.add('tp-active');
-      });
-      container.appendChild(btn);
-    });
-    // Keep mobile theme in sync when changed from desktop picker
-    document.addEventListener('themeChanged', function(){
-      var cur = document.documentElement.getAttribute('data-global-theme') || 'obsidian';
-      container.querySelectorAll('.tp-opt').forEach(function(o){
-        o.classList.toggle('tp-active', o.getAttribute('data-theme-id') === cur);
-      });
-    });
-  })();
-  </script>
   <script src="{% static 'js/base/loading.js' %}?v=11"></script>
-  <script src="{% static 'js/base/main.js' %}?v=7" defer></script>
-  <script src="{% static 'js/base/cart.js' %}?v=7" defer></script>
-  <script src="{% static 'js/base/favorites.js' %}?v=7" defer></script>
-  <script src="{% static 'js/base/navigation.js' %}?v=7" defer></script>
-  <script src="{% static 'js/base/mini_cart.js' %}?v=8" defer></script>
-  <script src="{% static 'js/base/search.js' %}?v=7" defer></script>
-  <script src="{% static 'js/base/newsletter.js' %}?v=7" defer></script>
-  <script src="{% static 'js/base/messages.js' %}?v=1" defer></script>
+  <script src="{% static 'js/main.min.js' %}?v=1" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="{% static 'js/base/map.js' %}?v=7"></script>
-  <script src="{% static 'js/base/map_enhance.js' %}?v=1"></script>
 
   <!-- Scripts: Page-Level Extra JS -->
   {% block extra_js %}{% endblock %}
