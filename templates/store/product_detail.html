@@ -25,6 +25,10 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/product_detail.css' %}">
+<style>
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 {% endblock %}
 
 {% block extra_head %}
@@ -387,28 +391,8 @@
 {% block extra_js %}
 <script src="{% static 'js/pages/product_detail.js' %}"></script>
 <script>
-(function(){
-  var stockStatus = document.getElementById('stock-status-display');
-  var qtyInput = document.getElementById('qty-input');
-  var productId = {{ product.id }};
-  if (!stockStatus && !qtyInput) return;
-  function refreshStock() {
-    fetch('/store/api/product-stock/' + productId + '/')
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (!data || data.error) return;
-        try { updateStockDisplay(productId, data, null); } catch(e) {}
-        var sc = document.getElementById('stock-count');
-        if (sc && !data.has_sizes && data.stock_remaining !== undefined) {
-          sc.textContent = data.stock_remaining;
-        }
-      })
-      .catch(function() {});
-  }
-  refreshStock();
-  window.addEventListener('pageshow', function(e) {
-    refreshStock();
-  });
-})();
+document.querySelectorAll('.btn-add-bag, .btn-shop-now').forEach(function(b){
+  if (!b.getAttribute('data-orig')) b.setAttribute('data-orig', b.innerHTML.trim());
+});
 </script>
 {% endblock %}

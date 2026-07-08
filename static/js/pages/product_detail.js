@@ -56,7 +56,9 @@ function addToCartWithSize(event, productId) {
         selectedSize = sizeInput.value;
     }
     var qty = parseInt(document.getElementById('qty-input').value) || 1;
-    addToCart(event, productId, null, qty, selectedSize);
+    var btn = event.currentTarget || null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+    addToCart(event, productId, btn, qty, selectedSize);
 }
 
 
@@ -79,11 +81,13 @@ function shopNow(evt, productId) {
         selectedSize = sizeInput.value;
     }
     var qty = parseInt(document.getElementById('qty-input').value) || 1;
-    addToCart(evt, productId, null, qty, selectedSize);
+    var btn = evt.currentTarget || null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+    addToCart(evt, productId, btn, qty, selectedSize);
     showToast('Taking you to checkout...');
     setTimeout(function() {
         window.location.href = '/store/checkout/';
-    }, 800);
+    }, 200);
 }
 
 

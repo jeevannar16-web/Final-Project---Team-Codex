@@ -14,9 +14,14 @@ function addToCart(event, productId, btnEl, quantity, size) {
   const csrfToken = getCookie('csrftoken');
   if (!csrfToken) {
     showToast('Security error: please refresh the page.', true);
-    if (btn) btn.disabled = false;
+    if (btn) { btn.disabled = false; btn.innerHTML = btn.getAttribute('data-orig') || 'ADD TO BAG'; }
     return;
   }
+  var badge = document.getElementById('cart-count');
+  var origCount = badge ? parseInt(badge.textContent) || 0 : 0;
+  if (badge) badge.textContent = origCount + (quantity || 1);
+  if (badge) { badge.style.transform = 'scale(1.4)'; setTimeout(function(){ badge.style.transform = ''; }, 250); }
+  showToast('Adding to bag...');
   var body = { quantity: quantity || 1 };
   if (size) body.size = size;
   fetch('/store/cart/add/' + productId + '/', {
@@ -26,17 +31,14 @@ function addToCart(event, productId, btnEl, quantity, size) {
     body: JSON.stringify(body)
   })
   .then(response => {
-    if (response.status === 401) { window.location.href = '/users/login/'; return null; }
+    if (response.status === 401) { showToast('Please sign in first.', true); if (badge) badge.textContent = origCount; window.location.href = '/users/login/'; return null; }
     if (!response.ok) throw new Error('HTTP ' + response.status);
     return response.json();
   })
   .then(data => {
     if (!data) return;
     if (data.success) {
-      const badge = document.getElementById('cart-count');
       if (badge && data.cart_count !== undefined) badge.textContent = data.cart_count;
-      const cartIcon = document.getElementById('cart-count');
-      if (cartIcon) { cartIcon.style.transform = 'scale(1.4)'; setTimeout(function(){ cartIcon.style.transform = ''; }, 250); }
       showToast(data.message || '✓ Added to bag!');
       try { updateStockDisplay(productId, data, btn); } catch(e) {}
       var ssEl = document.getElementById('stock-status-display');
@@ -54,10 +56,15 @@ function addToCart(event, productId, btnEl, quantity, size) {
       if (window.refreshMiniCart) setTimeout(window.refreshMiniCart, 100);
     } else {
       showToast(data.message || 'Cannot add this item!', true);
-      if (btn) btn.disabled = false;
+      if (badge) badge.textContent = origCount;
     }
+    if (btn) { btn.disabled = false; btn.innerHTML = btn.getAttribute('data-orig') || 'ADD TO BAG'; }
   })
-  .catch(function(error) { showToast('Network error: ' + error.message, true); if (btn) btn.disabled = false; });
+  .catch(function(error) {
+    showToast('Network error: ' + error.message, true);
+    if (badge) badge.textContent = origCount;
+    if (btn) { btn.disabled = false; btn.innerHTML = btn.getAttribute('data-orig') || 'ADD TO BAG'; }
+  });
 }
 
 
