@@ -48,6 +48,16 @@ if count < 10:
     print(f'Products in DB after load: {count}')
 else:
     print('Skipping fixture load — products already exist')
+
+# Reset SQLite autoincrement sequences for all tables
+from django.db import connection
+cursor = connection.cursor()
+cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND sql LIKE '%AUTOINCREMENT%'\")
+for row in cursor.fetchall():
+    table = row[0]
+    cursor.execute(f\"DELETE FROM sqlite_sequence WHERE name='{table}'\")
+    cursor.execute(f\"INSERT OR IGNORE INTO sqlite_sequence (name, seq) SELECT '{table}', COALESCE(MAX(id), 0) FROM {table}\")
+print('Reset autoincrement sequences')
 " 2>&1
 
 # --- Restore images from fixture ---
