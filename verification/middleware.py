@@ -31,8 +31,15 @@ class EmailVerificationMiddleware:
             return self.get_response(request)
 
         if request.user.is_authenticated:
-            profile = getattr(request.user, 'profile', None)
-            if profile and not profile.is_email_verified:
+            from django.core.cache import cache
+            uid = str(request.user.id)
+            key = 'email_ver_' + uid
+            verified = cache.get(key)
+            if verified is None:
+                profile = getattr(request.user, 'profile', None)
+                verified = not profile or profile.is_email_verified
+                cache.set(key, verified, 60)
+            if not verified:
                 return redirect('verification_setup')
 
         return self.get_response(request)

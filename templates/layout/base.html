@@ -54,7 +54,7 @@
 
   <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpg' %}">
   <!-- Head: Combined Base CSS -->
-  <link rel="stylesheet" href="{% static 'css/main.min.css' %}?v=2">
+  <link rel="stylesheet" href="{% static 'css/main.min.css' %}?v=3">
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
   <meta name="google-site-verification" content="2wT_X2-2qsBMBWZmfKlyqLbfqqYbG-SRG3tRTdjr22A" />
@@ -65,10 +65,14 @@
   {% include 'includes/cookie_consent.html' %}
 
   <!-- Pre-Header: Page Loader -->
+  <div id="loader-backdrop" class="loader-backdrop"></div>
   <div id="page-loader" class="page-loader"></div>
   <div id="loader-logo" class="loader-floating-logo">
-    <img src="{% static 'images/logo.jpg' %}" alt="" class="loader-floating-img">
-    <div class="loader-floating-ring"></div>
+    <div class="loader-ring-wrap">
+      <img src="{% static 'images/logo.jpg' %}" alt="" class="loader-floating-img">
+      <div class="loader-floating-ring"></div>
+    </div>
+    <div class="loader-floating-text">Loading</div>
   </div>
 
   <!-- Pre-Header: Offline Banner -->
@@ -129,8 +133,8 @@
   })();
   </script>
   <!-- Scripts: External JS Files -->
-  <script src="{% static 'js/base/loading.js' %}?v=12"></script>
-  <script src="{% static 'js/main.min.js' %}?v=2" defer></script>
+  <script src="{% static 'js/base/loading.js' %}?v=13"></script>
+  <script src="{% static 'js/main.min.js' %}?v=3" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Scripts: Page-Level Extra JS -->

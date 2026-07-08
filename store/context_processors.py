@@ -10,7 +10,7 @@ def global_context(request):
     categories = cache.get('global_categories')
     if categories is None:
         categories = list(Category.objects.all())
-        cache.set('global_categories', categories, 3600)
+        cache.set('global_categories', categories, 86400)
     cart_count = 0
     favorited_ids = []
 

@@ -235,5 +235,5 @@ else:
 
 # Reduce workers for free tier (Render caps at 1 CPU)
 exec gunicorn fitness_hub.wsgi:application \
-  --workers=2 --threads=2 --worker-class=gthread \
+  --workers=1 --threads=4 --worker-class=gthread \
   --timeout 120 --keep-alive 60

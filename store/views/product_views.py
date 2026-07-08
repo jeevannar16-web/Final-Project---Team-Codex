@@ -97,7 +97,7 @@ def _filter_and_sort_products(request):
 
 
 
-@cache_page(300, key_prefix='products')
+@cache_page(900, key_prefix='products')
 def product_list(request):
     products, title, is_search, category_id, goal, sort, price_min, price_max, selected_types, only_available, search_query = _filter_and_sort_products(request)
 

@@ -144,7 +144,7 @@ def home(request):
         context = cache.get(cache_key)
         if context is None:
             context = _home_context(lang_code)
-            cache.set(cache_key, context, 300)
+            cache.set(cache_key, context, 3600)
 
         base_qs = Product.objects.select_related('category')
         error = None
@@ -192,7 +192,7 @@ def home(request):
     context = cache.get(cache_key)
     if context is None:
         context = _home_context(lang_code)
-        cache.set(cache_key, context, 300)
+        cache.set(cache_key, context, 3600)
 
     # User-specific parts (never cached)
     context['search_results'] = Product.objects.none()
