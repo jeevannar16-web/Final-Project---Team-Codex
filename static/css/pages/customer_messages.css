@@ -17,12 +17,12 @@
 
 
 :root {
-  --cm-bg: #0f0f12;
-  --cm-surface: #16161d;
-  --cm-border: rgba(255, 255, 255, 0.07);
+  --cm-bg: #0d0d0d;
+  --cm-surface: #121212;
+  --cm-border: #1a1a1a;
   --cm-text: #f0ece4;
   --cm-text-sec: #b0a8a0;
-  --cm-text-muted: #6a6a7a;
+  --cm-text-muted: #666;
   --cm-accent: #d4af37;
   --cm-accent-glow: rgba(212, 175, 55, 0.15);
   --cm-accent-light: rgba(212, 175, 55, 0.08);
