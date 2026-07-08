@@ -60,14 +60,9 @@ if connection.vendor == 'sqlite':
         cursor.execute(f\"INSERT OR IGNORE INTO sqlite_sequence (name, seq) SELECT '{table}', COALESCE(MAX(id), 0) FROM {table}\")
     print('Reset SQLite autoincrement sequences')
 elif connection.vendor == 'postgresql':
-    cursor.execute(\"\"\"
-        SELECT sequence_name, table_name, column_name
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND (column_default LIKE 'nextval%%' OR is_identity = 'YES')
-    \"\"\")
-    for seq, tbl, col in cursor.fetchall():
-        cursor.execute(f\"SELECT setval('{seq}', COALESCE(MAX({col}), 0) + 1, false) FROM {tbl}\")
+    cursor.execute(\"SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public' AND (column_default LIKE 'nextval%%' OR is_identity = 'YES')\")
+    for tbl, col in cursor.fetchall():
+        cursor.execute(f\"SELECT setval(pg_get_serial_sequence('{tbl}', '{col}'), COALESCE(MAX({col}), 0) + 1, false) FROM {tbl}\")
     print('Reset PostgreSQL sequences')
 " 2>&1
 
