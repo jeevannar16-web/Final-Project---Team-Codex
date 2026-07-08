@@ -144,7 +144,7 @@ if staff.exists():
 else:
     print('No staff accounts found')
 
-# --- Ensure superuser exists (password from env or default 'jeevan120') ---
+# --- Ensure superuser exists (password from env, required) ---
 admin_email = os.environ.get('ADMIN_EMAIL') or os.environ.get('DEFAULT_FROM_EMAIL', 'admin@example.com')
 # Create 'admin' user (or use ADMIN_USERNAME env var)
 admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
@@ -152,7 +152,9 @@ user, created = User.objects.get_or_create(
     username=admin_username,
     defaults={'email': admin_email, 'is_superuser': True, 'is_staff': True}
 )
-admin_pass = os.environ.get('ADMIN_PASSWORD', 'jeevan120')
+admin_pass = os.environ.get('ADMIN_PASSWORD')
+if not admin_pass:
+    raise ValueError('ADMIN_PASSWORD environment variable must be set')
 user.set_password(admin_pass)
 user.is_superuser = True
 user.is_staff = True
