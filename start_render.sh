@@ -49,15 +49,26 @@ if count < 10:
 else:
     print('Skipping fixture load — products already exist')
 
-# Reset SQLite autoincrement sequences for all tables
+# Reset autoincrement sequences for all tables (SQLite or PostgreSQL)
 from django.db import connection
 cursor = connection.cursor()
-cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND sql LIKE '%AUTOINCREMENT%'\")
-for row in cursor.fetchall():
-    table = row[0]
-    cursor.execute(f\"DELETE FROM sqlite_sequence WHERE name='{table}'\")
-    cursor.execute(f\"INSERT OR IGNORE INTO sqlite_sequence (name, seq) SELECT '{table}', COALESCE(MAX(id), 0) FROM {table}\")
-print('Reset autoincrement sequences')
+if connection.vendor == 'sqlite':
+    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND sql LIKE '%AUTOINCREMENT%'\")
+    for row in cursor.fetchall():
+        table = row[0]
+        cursor.execute(f\"DELETE FROM sqlite_sequence WHERE name='{table}'\")
+        cursor.execute(f\"INSERT OR IGNORE INTO sqlite_sequence (name, seq) SELECT '{table}', COALESCE(MAX(id), 0) FROM {table}\")
+    print('Reset SQLite autoincrement sequences')
+elif connection.vendor == 'postgresql':
+    cursor.execute(\"\"\"
+        SELECT sequence_name, table_name, column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND (column_default LIKE 'nextval%%' OR is_identity = 'YES')
+    \"\"\")
+    for seq, tbl, col in cursor.fetchall():
+        cursor.execute(f\"SELECT setval('{seq}', COALESCE(MAX({col}), 0) + 1, false) FROM {tbl}\")
+    print('Reset PostgreSQL sequences')
 " 2>&1
 
 # --- Restore images from fixture ---
