@@ -23,9 +23,6 @@
   window.addEventListener('load', hide);
   document.addEventListener('turbolinks:load', hide);
 
-  // Show loader on Turbolinks navigation
-  document.addEventListener('turbolinks:before-visit', show);
-
   // Safety: hide after 3s even if something fails
   setTimeout(function() { if (!loaded) hide(); }, 3000);
 

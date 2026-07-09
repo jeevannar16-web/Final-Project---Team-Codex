@@ -442,7 +442,7 @@
   </div>
   <div class="feat-grid" id="products-container">
     {% for product in featured_products %}
-    <div class="fcard {% if forloop.counter > 10 %}hidden-product{% endif %}" onclick="window.location.href='{% url 'store:product_detail' product.id %}'">
+    <a href="{% url 'store:product_detail' product.id %}" class="fcard {% if forloop.counter > 10 %}hidden-product{% endif %}" style="display:block;text-decoration:none;color:inherit;">
       <div class="fcard-img">
         {% if product.image %}
         <img loading="lazy" src="{{ product.image|img_url:'300x300' }}" alt="{{ product.name|t }}">
@@ -457,16 +457,16 @@
         <div class="fcard-row">
           <span class="fcard-price">{% if product.discount_percent > 0 %}<span class="hc-oprice">{{ product.original_price|currency }}</span> {% endif %}{{ product.price|currency }}</span>
           <div class="fcard-actions">
-            <button class="fcard-fav {% if product.id in global_favorited_ids %}favorited{% endif %}" onclick="event.stopPropagation(); toggleFavorite(event, {{ product.id }}, this)" title="Wishlist">
+            <button class="fcard-fav {% if product.id in global_favorited_ids %}favorited{% endif %}" onclick="event.preventDefault();event.stopPropagation();toggleFavorite(event, {{ product.id }}, this)" title="Wishlist">
               <i class="bi {% if product.id in global_favorited_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
             </button>
-            <button class="fcard-cart" onclick="event.stopPropagation(); addToCart(event, {{ product.id }}, this)" title="Add to cart">
+            <button class="fcard-cart" onclick="event.preventDefault();event.stopPropagation();addToCart(event, {{ product.id }}, this)" title="Add to cart">
               <i class="bi bi-bag-plus"></i>
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </a>
     {% endfor %}
   </div>
   {% if featured_products|length > 10 %}
