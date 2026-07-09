@@ -5,62 +5,38 @@
   var banner = document.getElementById('offline-banner');
   if (!bar) return;
 
-  var timer = null;
   var loaded = false;
 
-  function show() {
-    bar.classList.add('active');
-    if (logo) logo.classList.add('active');
-    if (backdrop) backdrop.classList.add('active');
-  }
   function hide() {
     loaded = true;
     bar.classList.remove('active');
     if (logo) logo.classList.remove('active');
     if (backdrop) backdrop.classList.remove('active');
-    if (timer) { clearTimeout(timer); timer = null; }
-  }
-  function showDelayed(delay) {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(function() {
-      if (!loaded) show();
-    }, delay || 500);
   }
 
+  // Hide once everything loads
+  window.addEventListener('load', hide);
+  document.addEventListener('turbolinks:load', hide);
+
+  // Safety: hide after 2s even if something fails
+  setTimeout(function() { if (!loaded) hide(); }, 2000);
+
+  // Show only on initial page load, never on Turbolinks clicks
   if (document.readyState === 'loading') {
-    showDelayed(500);
-  }
-  document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(hide, 200);
-  });
-  window.addEventListener('load', function () {
+    bar.classList.add('active');
+    if (logo) logo.classList.add('active');
+    if (backdrop) backdrop.classList.add('active');
+  } else {
     hide();
-  });
+  }
 
-  setTimeout(function() {
-    if (!loaded) hide();
-  }, 2000);
-
-  document.addEventListener('click', function (e) {
-    var link = e.target.closest('a[href]');
-    if (!link) return;
-    var h = link.getAttribute('href');
-    if (!h || h.startsWith('#') || h.startsWith('javascript') || h.startsWith('tel:') || h.startsWith('mailto:')) return;
-    if (link.hasAttribute('download') || link.target === '_blank') return;
-    if (!(h.startsWith('/') || h.startsWith(window.location.origin))) return;
-    loaded = false;
-    showDelayed(500);
-  });
-
+  // Show on form submits (not intercepted by Turbolinks)
   document.addEventListener('submit', function (e) {
     if (e.defaultPrevented) return;
     if (e.target.getAttribute('data-no-loader') === 'true') return;
-    loaded = false;
-    showDelayed(500);
-  });
-
-  document.addEventListener('turbolinks:load', function () {
-    hide();
+    bar.classList.add('active');
+    if (logo) logo.classList.add('active');
+    if (backdrop) backdrop.classList.add('active');
   });
 
   function verifyOnline() {
