@@ -28,5 +28,6 @@
         xhr.send();
     }
     check();
-    setInterval(check, 5000);
+    var interval = setInterval(check, 5000);
+    document.addEventListener('turbolinks:before-visit', function(){ clearInterval(interval); });
 })();

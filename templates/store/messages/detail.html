@@ -581,6 +581,7 @@
     input.addEventListener('keydown', function(e){
       if(e.key === 'Enter' && !e.shiftKey){
         e.preventDefault();
+        if(sendBtn.disabled) return;
         var text = this.value.trim();
         if(text && !isBlocked) sendMessage(text);
       }
@@ -675,6 +676,7 @@
         clearAttachPreview();
         input.value = '';
         input.style.height = 'auto';
+        try { var d = JSON.parse(xhr.responseText); if(d.id){ addMessageToBody(d); lastId = d.id; } } catch(e){}
         setTimeout(function(){ body.scrollTop = body.scrollHeight; }, 100);
       } else {
         try { var d = JSON.parse(xhr.responseText); alert(d.error || '{{ 'Upload failed'|t }}'); } catch(e){ alert('{{ 'Upload failed'|t }}'); }
@@ -798,7 +800,7 @@
   var els = body.querySelectorAll('.md-msg-wrap');
   if(els.length) lastId = parseInt(els[els.length - 1].dataset.msgId) || 0;
 
-  setInterval(function(){
+  function pollMessages(){
     if(isBlocked) return;
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '{% url "store:api_new_messages" conversation.id %}?since=' + lastId, true);
@@ -815,7 +817,6 @@
           lastId = m.id;
         });
         body.scrollTop = body.scrollHeight;
-        // Browser notification
         if(document.hidden && Notification && Notification.permission === 'granted'){
           var lastMsg = data.messages[data.messages.length - 1];
           if(!lastMsg.is_mine){
@@ -825,9 +826,35 @@
       } catch(e){}
     };
     xhr.send();
-  }, 2500);
+  }
 
-  // === NOTIFICATION PERMISSION ===
+  function pollReactions(){
+    var msgWraps = body.querySelectorAll('.md-msg-wrap[data-msg-id]');
+    if(!msgWraps.length) return;
+    var ids = [];
+    msgWraps.forEach(function(w){ ids.push(w.getAttribute('data-msg-id')); });
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{% url "store:api_reaction_updates" conversation.id %}?ids=' + ids.join(','), true);
+    xhr.onload = function(){
+      if(xhr.status !== 200) return;
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if(!data || !data.reactions) return;
+        Object.keys(data.reactions).forEach(function(msgId){
+          updateReactionsDisplay(parseInt(msgId), data.reactions[msgId]);
+        });
+      } catch(e){}
+    };
+    xhr.send();
+  }
+
+  var msgInterval = setInterval(pollMessages, 2500);
+  var reactInterval = setInterval(pollReactions, 3000);
+  document.addEventListener('turbolinks:before-visit', function(){
+    clearInterval(msgInterval);
+    clearInterval(reactInterval);
+  });
+
   if('Notification' in window && Notification.permission === 'default'){
     Notification.requestPermission();
   }
@@ -838,23 +865,18 @@
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '{% url "store:api_online_status" %}', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-CSRFToken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    xhr.setRequestHeader('X-CSRFToken', document.querySelector('[name=csrfmiddlewaretoken]')?.value || '');
     xhr.onload = function(){
       if(xhr.status !== 200) return;
       try {
         var data = JSON.parse(xhr.responseText);
-        // Top bar status
         var avatarStatus = document.getElementById('avatar-status');
         var statusDot = document.getElementById('status-dot');
         var statusText = document.getElementById('status-text');
-        // Sidebar status
         var sidebarDot = document.getElementById('sidebar-online-dot');
         var sidebarLabel = document.getElementById('p-status-text');
-
-        // Custom status from user
         var customEmoji = data.status_emoji || '';
         var customText = data.status_text || '';
-
         if(data.is_online){
           [avatarStatus, statusDot, sidebarDot].forEach(function(el){
             if(el){ el.classList.remove('offline', 'typing'); el.classList.add('online'); }
@@ -882,7 +904,8 @@
   }
 
   pollOnlineStatus();
-  setInterval(pollOnlineStatus, 30000);
+  var statusInterval = setInterval(pollOnlineStatus, 30000);
+  document.addEventListener('turbolinks:before-visit', function(){ clearInterval(statusInterval); });
 
 })();
 
