@@ -7,8 +7,22 @@ from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.views.decorators.cache import cache_page, cache_control
 from django.views.decorators.vary import vary_on_cookie
+from functools import wraps
 from ..models import Category, Product, FavoriteItem, Review, OrderItem
 from django.db.models import Count, Avg
+
+
+def cache_anon(timeout, key_prefix=None):
+    """Cache page only for anonymous (non-logged-in) users."""
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if request.user.is_authenticated:
+                return view_func(request, *args, **kwargs)
+            decorated = cache_page(timeout, key_prefix=key_prefix)(view_func)
+            return decorated(request, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 # SEARCH & PRODUCT LISTING
@@ -148,6 +162,7 @@ def product_list(request):
 
 
 
+@cache_anon(300, key_prefix='pd')
 @cache_control(max_age=300, private=True)
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)

@@ -18,3 +18,4 @@ whitenoise>=6.7.0
 cloudinary>=1.40.0
 django-cloudinary-storage>=0.3.0
 sentry-sdk==2.63.0
+django-redis>=5.4.0
