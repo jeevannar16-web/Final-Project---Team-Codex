@@ -1,25 +1,29 @@
 (function () {
-  var bar = document.getElementById('page-loader');
-  var logo = document.getElementById('loader-logo');
-  var backdrop = document.getElementById('loader-backdrop');
   var banner = document.getElementById('offline-banner');
-  if (!bar) return;
-
   var loaded = false;
 
+  function el(id) { return document.getElementById(id); }
+
   function showBar() {
-    bar.classList.add('active');
+    var bar = el('page-loader');
+    if (bar) bar.classList.add('active');
   }
 
   function showFull() {
-    bar.classList.add('active');
+    var bar = el('page-loader');
+    var logo = el('loader-logo');
+    var backdrop = el('loader-backdrop');
+    if (bar) bar.classList.add('active');
     if (logo) logo.classList.add('active');
     if (backdrop) backdrop.classList.add('active');
   }
 
   function hide() {
     loaded = true;
-    bar.classList.remove('active');
+    var bar = el('page-loader');
+    var logo = el('loader-logo');
+    var backdrop = el('loader-backdrop');
+    if (bar) bar.classList.remove('active');
     if (logo) logo.classList.remove('active');
     if (backdrop) backdrop.classList.remove('active');
   }
