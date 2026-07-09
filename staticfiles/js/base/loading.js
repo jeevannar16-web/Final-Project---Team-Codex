@@ -7,7 +7,11 @@
 
   var loaded = false;
 
-  function show() {
+  function showBar() {
+    bar.classList.add('active');
+  }
+
+  function showFull() {
     bar.classList.add('active');
     if (logo) logo.classList.add('active');
     if (backdrop) backdrop.classList.add('active');
@@ -23,12 +27,15 @@
   window.addEventListener('load', hide);
   document.addEventListener('turbolinks:load', hide);
 
+  // Show thin loading bar during Turbolinks navigation
+  document.addEventListener('turbolinks:before-visit', showBar);
+
   // Safety: hide after 3s even if something fails
   setTimeout(function() { if (!loaded) hide(); }, 3000);
 
   // Show on initial page load
   if (document.readyState === 'loading') {
-    show();
+    showFull();
   } else {
     hide();
   }
@@ -37,7 +44,7 @@
   document.addEventListener('submit', function (e) {
     if (e.defaultPrevented) return;
     if (e.target.getAttribute('data-no-loader') === 'true') return;
-    show();
+    showFull();
   });
 
   function verifyOnline() {
