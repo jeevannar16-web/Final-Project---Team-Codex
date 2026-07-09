@@ -1,35 +1,7 @@
 // ==============================================================================
 // File: navigation.js
-// Description: Dropdown toggles, category navigation scroll with drag support
-// ==============================================================================
-
-// ==============================================================================
-// SECTION: Dropdown Toggle (delegated, no stale refs — safe across Turbolinks)
-// ==============================================================================
-
-(function () {
-  function toggleDropdown(btn) {
-    var container = btn.closest('.nav-lang, .user-dropdown');
-    if (!container) return;
-    var isOpen = container.classList.contains('open');
-    document.querySelectorAll('.nav-lang.open, .user-dropdown.open').forEach(function (el) {
-      if (el !== container) el.classList.remove('open');
-    });
-    container.classList.toggle('open', !isOpen);
-  }
-  document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.nav-lang-btn, .user-dropdown > .nav-icon-btn');
-    if (btn) { e.stopPropagation(); toggleDropdown(btn); return; }
-    var inside = e.target.closest('.nav-lang-drop, .dropdown-content');
-    if (inside) return;
-    document.querySelectorAll('.nav-lang.open, .user-dropdown.open').forEach(function (el) {
-      el.classList.remove('open');
-    });
-  });
-})();
-
-// ==============================================================================
-// SECTION: Category Navigation Scroll
+// Description: Category navigation scroll with drag support (re-inits on turbolinks:load)
+// NOTE: Dropdown toggles are handled by main.min.js via delegated document listener — do NOT add here.
 // ==============================================================================
 // Re-queries DOM on each turbolinks:load so arrows don't break after navigation.
 
