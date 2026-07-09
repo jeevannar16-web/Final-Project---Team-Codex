@@ -34,7 +34,7 @@
 
 {% block content %}
 {% with user_blocked=is_blocked %}
-<div class="cd-page" id="cd-page">
+<div class="cd-page" id="cd-page" data-theme="{{ conversation.theme }}">
 
   <!-- ─── TOP BAR ─── -->
   <div class="cd-top-bar">
@@ -1003,7 +1003,7 @@
   };
 
   window.setChatTheme = function(themeKey){
-    var page = document.getElementById('md-page');
+    var page = document.getElementById('cd-page');
     if(page) page.setAttribute('data-theme', themeKey);
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '{% url "store:api_change_theme" %}', true);

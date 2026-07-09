@@ -30,6 +30,8 @@
     L.marker([lat, lng]).addTo(map)
       .bindPopup('Delivery Location');
 
+    el._leaflet_map = map;
+
     if (typeof enhanceMap === 'function') {
       enhanceMap(map, { fullscreen: true, panArrows: false, myLocation: false });
     }

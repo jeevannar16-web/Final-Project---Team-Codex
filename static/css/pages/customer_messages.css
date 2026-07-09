@@ -548,15 +548,7 @@ main:has(.cm-page) {
   white-space: nowrap;
   transition: all 0.25s ease;
 }
-.cm-row:hover 
-/* ==============================================================================
-   SECTION: Store Badge
-   ============================================================================== */
-
-
-
-
-.cm-store-badge {
+.cm-row:hover .cm-store-badge {
   background: rgba(212, 175, 55, 0.18);
 }
 
@@ -644,15 +636,7 @@ main:has(.cm-page) {
   animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   transition: all 0.25s ease;
 }
-.cm-row:hover 
-/* ==============================================================================
-   SECTION: Unread Badge
-   ============================================================================== */
-
-
-
-
-.cm-unread {
+.cm-row:hover .cm-unread {
   transform: scale(1.12);
   box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
@@ -1260,7 +1244,7 @@ main:has(.cm-page) {
   position: relative;
   display: flex;
   flex-direction: column;
-  max-width: 70%;
+  max-width: 75%;
 }
 .cd-msg-wrap.mine { align-self: flex-end; }
 .cd-msg-wrap.theirs { align-self: flex-start; }
@@ -1291,14 +1275,14 @@ main:has(.cm-page) {
   box-shadow: 0 4px 24px var(--cm-accent-glow);
 }
 .cd-msg-wrap.theirs .cd-msg {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--cm-text);
   border-bottom-left-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: background 0.25s;
 }
 .cd-msg-wrap.theirs .cd-msg:hover {
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.13);
 }
 
 .cd-msg img.cd-img {
@@ -1330,6 +1314,10 @@ main:has(.cm-page) {
 .cd-msg-wrap.theirs + .cd-msg-wrap.theirs .cd-msg {
   border-top-left-radius: 14px;
   margin-top: 1px;
+}
+
+.cd-msg-content {
+  min-width: 0;
 }
 
 .cd-msg-deleted {
