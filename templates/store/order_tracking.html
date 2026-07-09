@@ -188,17 +188,10 @@ document.querySelectorAll('[data-toggle-map]').forEach(function(btn) {
     } else {
       mapEl.style.height = '180px';
       this.innerHTML = 'Hide Map <i class="bi bi-chevron-up"></i>';
-      if (mapEl._leaflet_id) {
+      if (mapEl._leaflet_map) {
         mapEl._leaflet_map.invalidateSize();
-      } else {
-        var lat = parseFloat(mapEl.getAttribute('data-lat'));
-        var lng = parseFloat(mapEl.getAttribute('data-lng'));
-        if (!isNaN(lat) && !isNaN(lng)) {
-          var map = L.map(mapEl, { center: [lat, lng], zoom: 15, zoomControl: false, dragging: false, scrollWheelZoom: false, attributionControl: false });
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-          L.marker([lat, lng]).addTo(map).bindPopup('Delivery Location');
-          mapEl._leaflet_map = map;
-        }
+      } else if (typeof window.initOrderMap === 'function') {
+        window.initOrderMap(mapEl);
       }
     }
   });

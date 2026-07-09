@@ -216,10 +216,6 @@ def conversation_detail(request, conversation_id):
         'status_options': status_options,
     }
 
-    # Customers get a dedicated professional chat page
-    if not user.is_staff and not is_seller:
-        return render(request, 'store/messages/customer_detail.html', context)
-
     return render(request, 'store/messages/detail.html', context)
 
 

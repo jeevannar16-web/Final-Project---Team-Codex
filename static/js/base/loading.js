@@ -59,6 +59,10 @@
     showDelayed(500);
   });
 
+  document.addEventListener('turbolinks:load', function () {
+    hide();
+  });
+
   function verifyOnline() {
     if (!banner) return;
     fetch(window.location.origin + '/', { method: 'HEAD', cache: 'no-cache' })

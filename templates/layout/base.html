@@ -58,6 +58,12 @@
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
   <meta name="google-site-verification" content="2wT_X2-2qsBMBWZmfKlyqLbfqqYbG-SRG3tRTdjr22A" />
+  <!-- Head: Turbolinks — instant navigation cache for back/forward etc. -->
+  <script src="https://cdn.jsdelivr.net/npm/turbolinks@5.2.0/dist/turbolinks.min.js"></script>
+  <!-- Head: Core JS (loaded once; Turbolinks tracks for cache-bust) -->
+  <script src="{% static 'js/base/loading.js' %}?v=13"></script>
+  <script src="{% static 'js/main.min.js' %}?v=3" data-turbolinks-track="reload"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -132,12 +138,7 @@
     document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
   })();
   </script>
-  <!-- Scripts: External JS Files -->
-  <script src="{% static 'js/base/loading.js' %}?v=13"></script>
-  <script src="{% static 'js/main.min.js' %}?v=3" defer></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Scripts: Page-Level Extra JS -->
+  <!-- Scripts: Page-Level Extra JS (re-evaluated on each Turbolinks navigation) -->
   {% block extra_js %}{% endblock %}
 
   {% if user.is_authenticated %}
