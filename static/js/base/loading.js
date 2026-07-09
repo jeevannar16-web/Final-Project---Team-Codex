@@ -28,14 +28,14 @@
     if (backdrop) backdrop.classList.remove('active');
   }
 
-  window.addEventListener('load', hide);
+  document.addEventListener('DOMContentLoaded', hide);
   document.addEventListener('turbolinks:load', hide);
 
   // Show thin loading bar during Turbolinks navigation
   document.addEventListener('turbolinks:before-visit', showBar);
 
-  // Safety: hide after 3s even if something fails
-  setTimeout(function() { if (!loaded) hide(); }, 3000);
+  // Safety: hide after 2s even if something fails (was 3s — too slow, blocks clicks)
+  setTimeout(function() { if (!loaded) hide(); }, 2000);
 
   // Show on initial page load
   if (document.readyState === 'loading') {

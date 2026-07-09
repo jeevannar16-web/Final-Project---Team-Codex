@@ -33,7 +33,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: #c4783a;
+  background: #e04040;
   animation: loaderBar 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @keyframes loaderBar {
