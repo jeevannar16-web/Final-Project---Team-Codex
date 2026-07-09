@@ -1,9 +1,3 @@
-// ==============================================================================
-// File: theme.js
-// Description: 13-theme picker — 8 solid dark + 5 animated premium.
-// Uses data-global-theme to avoid conflict with chat's data-theme system.
-// ==============================================================================
-
 (function() {
   var STORAGE_KEY = 'fitnesshub_theme';
   var ATTR = 'data-global-theme';
@@ -11,9 +5,7 @@
   var metaColorScheme = document.querySelector('meta[name="color-scheme"]');
 
   var THEMES = [
-    // System
     { id: 'system',    label: 'System Default', icon: '💻', color: '#1a1a2e' },
-    // Solid Dark
     { id: 'obsidian',  label: 'Obsidian',  icon: '🌑', color: '#08080c' },
     { id: 'midnight',  label: 'Midnight',  icon: '🌃', color: '#080c1a' },
     { id: 'forest',    label: 'Forest',    icon: '🌲', color: '#070e08' },
@@ -22,7 +14,6 @@
     { id: 'slate',     label: 'Slate',      icon: '🪨', color: '#0c0e12' },
     { id: 'charcoal',  label: 'Charcoal',  icon: '🖤', color: '#14151a' },
     { id: 'copper',    label: 'Copper',    icon: '🔶', color: '#120e0a' },
-    // Animated
     { id: 'aurora',    label: 'Aurora',    icon: '🌌', color: '#060a12' },
     { id: 'galaxy',    label: 'Galaxy',    icon: '✨', color: '#04040a' },
     { id: 'sunset',    label: 'Sunset',    icon: '🌅', color: '#120804' },
@@ -33,7 +24,7 @@
   function updateBtnIcon(themeId) {
     var btn = document.getElementById('theme-picker-btn');
     if (!btn) return;
-    var t = THEMES.find(function(x) { return x.id === themeId; }) || THEMES[1];
+    var t = THEMES.find(function(x) { return x.id === themeId; }) || THEMES[0];
     btn.innerHTML = '<span class="tp-btn-icon">' + t.icon + '</span><span class="tp-btn-label">Theme</span>';
   }
 
@@ -48,29 +39,30 @@
     metaColorScheme.content = 'only dark';
     updateBtnIcon(themeId);
     var picker = document.getElementById('theme-picker-dropdown');
-    if (picker) picker.classList.remove('open');
+    if (picker) {
+      picker.classList.remove('open');
+      picker.style.display = '';
+      picker.style.gridTemplateColumns = '';
+    }
     document.dispatchEvent(new CustomEvent('themeChanged'));
   }
 
-  // Restore saved theme — default to system
-  var saved = localStorage.getItem(STORAGE_KEY);
-  if (saved && THEMES.some(function(t) { return t.id === saved; })) {
-    applyTheme(saved);
-  } else {
-    applyTheme('system');
-  }
+  function initPicker() {
+    var picker = document.getElementById('theme-picker-dropdown');
+    var btn = document.getElementById('theme-picker-btn');
+    if (!picker || !btn) return;
 
-  // Setup picker
-  var btn = document.getElementById('theme-picker-btn');
-  var picker = document.getElementById('theme-picker-dropdown');
-  if (btn && picker) {
-    var cur = html.getAttribute(ATTR) || 'obsidian';
-    updateBtnIcon(cur);
+    // Already initialized — just update active state
+    if (picker.getAttribute('data-init')) {
+      var cur = html.getAttribute(ATTR) || 'system';
+      picker.querySelectorAll('.tp-opt').forEach(function(o) {
+        o.classList.toggle('tp-active', o.getAttribute('data-theme-id') === cur);
+      });
+      updateBtnIcon(cur);
+      return;
+    }
 
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      picker.classList.toggle('open');
-    });
+    var cur = html.getAttribute(ATTR) || 'system';
 
     function addSep(label) {
       var sep = document.createElement('div');
@@ -78,10 +70,13 @@
       sep.textContent = label;
       picker.appendChild(sep);
     }
+
     var lastCat = '';
     THEMES.forEach(function(theme, idx) {
       var cat = idx === 0 ? 'system' : (idx <= 8 ? 'solid' : 'animated');
-      if (cat !== lastCat && idx > 0) { addSep(cat === 'solid' ? '— Solid —' : '— Animated —'); }
+      if (cat !== lastCat && idx > 0) {
+        addSep(cat === 'solid' ? '— Solid —' : '— Animated —');
+      }
       lastCat = cat;
       var opt = document.createElement('div');
       opt.className = 'tp-opt' + (theme.id === cur ? ' tp-active' : '');
@@ -96,17 +91,34 @@
       picker.appendChild(opt);
     });
 
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      picker.classList.toggle('open');
+    });
+
     document.addEventListener('click', function(e) {
       if (!btn.contains(e.target) && !picker.contains(e.target)) {
         picker.classList.remove('open');
       }
     });
+
+    picker.setAttribute('data-init', '1');
   }
 
-  // Expose for mobile menu
+  // Apply saved theme on startup
+  var saved = localStorage.getItem(STORAGE_KEY);
+  if (saved && THEMES.some(function(t) { return t.id === saved; })) {
+    applyTheme(saved);
+  } else {
+    applyTheme('system');
+  }
+
+  // Initialize on both page load and Turbolinks navigation
+  initPicker();
+  document.addEventListener('turbolinks:load', initPicker);
+
   window.__themeData = { themes: THEMES, apply: applyTheme };
-})();
-// ==============================================================================
+})();// ==============================================================================
 // File: main.js
 // Description: Search validation, CSRF cookie, toast notifications, back-to-top
 // ==============================================================================
@@ -730,7 +742,8 @@ window.addEventListener('pageshow', function(e) {
         xhr.send();
     }
     check();
-    setInterval(check, 5000);
+    var interval = setInterval(check, 5000);
+    document.addEventListener('turbolinks:before-visit', function(){ clearInterval(interval); });
 })();
 // ==============================================================================
 // File: navigation.js
