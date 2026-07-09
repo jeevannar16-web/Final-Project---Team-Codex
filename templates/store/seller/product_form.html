@@ -42,7 +42,7 @@
     <p class="page-sub">{{ 'Create a new product listing.'|t }}</p>
     {% endif %}
 
-    <form method="post" enctype="multipart/form-data" style="background:#141414;border:1px solid #1f1f1f;border-radius:10px;padding:28px;max-width:720px;">
+    <form method="post" enctype="multipart/form-data" data-turbolinks="false" style="background:#141414;border:1px solid #1f1f1f;border-radius:10px;padding:28px;max-width:720px;">
       {% csrf_token %}
 
       <div style="margin-bottom:18px;">

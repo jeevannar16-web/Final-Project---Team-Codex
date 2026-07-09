@@ -52,10 +52,12 @@
     document.dispatchEvent(new CustomEvent('themeChanged'));
   }
 
-  // Restore saved theme
+  // Restore saved theme — default to system
   var saved = localStorage.getItem(STORAGE_KEY);
   if (saved && THEMES.some(function(t) { return t.id === saved; })) {
     applyTheme(saved);
+  } else {
+    applyTheme('system');
   }
 
   // Setup picker

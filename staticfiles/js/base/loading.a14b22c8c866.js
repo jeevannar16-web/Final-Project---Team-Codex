@@ -1,6 +1,7 @@
 (function () {
   var bar = document.getElementById('page-loader');
   var logo = document.getElementById('loader-logo');
+  var backdrop = document.getElementById('loader-backdrop');
   var banner = document.getElementById('offline-banner');
   if (!bar) return;
 
@@ -10,11 +11,13 @@
   function show() {
     bar.classList.add('active');
     if (logo) logo.classList.add('active');
+    if (backdrop) backdrop.classList.add('active');
   }
   function hide() {
     loaded = true;
     bar.classList.remove('active');
     if (logo) logo.classList.remove('active');
+    if (backdrop) backdrop.classList.remove('active');
     if (timer) { clearTimeout(timer); timer = null; }
   }
   function showDelayed(delay) {
@@ -36,7 +39,7 @@
 
   setTimeout(function() {
     if (!loaded) hide();
-  }, 3000);
+  }, 2000);
 
   document.addEventListener('click', function (e) {
     var link = e.target.closest('a[href]');
@@ -54,6 +57,10 @@
     if (e.target.getAttribute('data-no-loader') === 'true') return;
     loaded = false;
     showDelayed(500);
+  });
+
+  document.addEventListener('turbolinks:load', function () {
+    hide();
   });
 
   function verifyOnline() {

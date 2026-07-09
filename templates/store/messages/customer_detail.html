@@ -486,7 +486,7 @@
   var pendingFile = null;
   var MAX_FILE_SIZE = 20 * 1024 * 1024;
 
-  if(attachBtn) attachBtn.addEventListener('click', function(){ fileInput.click(); });
+  if(attachBtn && fileInput) attachBtn.addEventListener('click', function(){ fileInput.click(); });
   if(fileInput){
     fileInput.addEventListener('change', function(){
       var f = this.files[0];

@@ -51,6 +51,7 @@ function addToCartWithSize(event, productId) {
     if (hasSizes && sizeInput) {
         if (!sizeInput.value) {
             document.getElementById('size-error').style.display = 'block';
+            showToast('Please select a size first.', true);
             return;
         }
         selectedSize = sizeInput.value;
@@ -76,6 +77,7 @@ function shopNow(evt, productId) {
     if (hasSizes && sizeInput) {
         if (!sizeInput.value) {
             document.getElementById('size-error').style.display = 'block';
+            showToast('Please select a size first.', true);
             return;
         }
         selectedSize = sizeInput.value;

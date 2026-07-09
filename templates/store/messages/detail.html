@@ -608,7 +608,7 @@
   var pendingFile = null;
   var MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
-  if(attachBtn){
+  if(attachBtn && fileInput){
     attachBtn.addEventListener('click', function(){ fileInput.click(); });
   }
 
@@ -667,7 +667,8 @@
     sendBtn.disabled = true;
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '{% url "store:api_upload_file" %}', true);
-    xhr.setRequestHeader('X-CSRFToken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    xhr.setRequestHeader('X-CSRFToken', csrfToken ? csrfToken.value : '');
     xhr.onload = function(){
       sendBtn.disabled = false;
       if(xhr.status === 200){
