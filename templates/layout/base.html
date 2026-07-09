@@ -63,11 +63,10 @@
   <meta name="google-site-verification" content="2wT_X2-2qsBMBWZmfKlyqLbfqqYbG-SRG3tRTdjr22A" />
   <!-- Head: Turbolinks — instant navigation cache for back/forward etc. -->
   <script src="https://cdn.jsdelivr.net/npm/turbolinks@5.2.0/dist/turbolinks.min.js"></script>
-  <style>.turbolinks-progress-bar{display:none!important}main{opacity:1;transition:opacity .12s ease}html.tl-loading main{opacity:0}</style>
-  <script>document.addEventListener('turbolinks:before-visit',function(){document.documentElement.classList.add('tl-loading')});document.addEventListener('turbolinks:load',function(){document.documentElement.classList.remove('tl-loading')});</script>
+  <style>.turbolinks-progress-bar{display:none!important}</style>
   <!-- Head: Core JS (loaded once; Turbolinks tracks for cache-bust) -->
-  <script src="{% static 'js/base/loading.js' %}?v=19" data-turbolinks-track="reload"></script>
-  <script src="{% static 'js/main.min.js' %}?v=8" data-turbolinks-track="reload"></script>
+<script src="{% static 'js/base/loading.js' %}?v=20" data-turbolinks-track="reload"></script>
+<script src="{% static 'js/main.min.js' %}?v=8" data-turbolinks-track="reload"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 </head>
 <body>
