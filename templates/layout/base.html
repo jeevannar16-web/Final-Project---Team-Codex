@@ -57,17 +57,17 @@
   <link rel="preload" as="image" href="{% static 'images/logo.webp' %}" type="image/webp">
   <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpg' %}">
   <!-- Head: Combined Base CSS -->
-  <link rel="stylesheet" href="{% static 'css/main.min.css' %}?v=7">
+  <link rel="stylesheet" href="{% static 'css/main.min.css' %}?v=8">
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
   <meta name="google-site-verification" content="2wT_X2-2qsBMBWZmfKlyqLbfqqYbG-SRG3tRTdjr22A" />
   <!-- Head: Turbolinks — instant navigation cache for back/forward etc. -->
   <script src="https://cdn.jsdelivr.net/npm/turbolinks@5.2.0/dist/turbolinks.min.js"></script>
-  <script>document.addEventListener('turbolinks:load',function(){if(typeof Turbolinks!=='undefined'){Turbolinks.setProgressBarDelay&&Turbolinks.setProgressBarDelay(1);}});</script>
-  <style id="turbolinks-progress-bar">.turbolinks-progress-bar{position:fixed;display:block;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,#d4af37,#f0d060);z-index:999999;transition:width .1s ease;box-shadow:0 0 12px rgba(212,175,55,.6)}</style>
+  <style>html.tl-loading main,html.tl-loading #floating-nav,html.tl-loading #msg-bubble{opacity:0}main{transition:opacity .12s ease}.fade-in{animation:fadeIn .15s ease both}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}</style>
+  <script>document.addEventListener('turbolinks:before-visit',function(){document.documentElement.classList.add('tl-loading')});document.addEventListener('turbolinks:load',function(){document.documentElement.classList.remove('tl-loading')});</script>
   <!-- Head: Core JS (loaded once; Turbolinks tracks for cache-bust) -->
-  <script src="{% static 'js/base/loading.js' %}?v=17" data-turbolinks-track="reload"></script>
-  <script src="{% static 'js/main.min.js' %}?v=6" data-turbolinks-track="reload"></script>
+  <script src="{% static 'js/base/loading.js' %}?v=18" data-turbolinks-track="reload"></script>
+  <script src="{% static 'js/main.min.js' %}?v=7" data-turbolinks-track="reload"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 </head>
 <body>
