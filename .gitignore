@@ -223,3 +223,4 @@ __marimo__/
 sent_emails/
 media/chat_files/
 fitnesshub_export.json
+fixtures/seed_data.json
