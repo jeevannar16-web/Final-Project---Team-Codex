@@ -30,7 +30,7 @@ function addToCart(event, productId, btnEl, quantity, size) {
     body: JSON.stringify(body)
   })
   .then(response => {
-    if (response.status === 401) { showToast('Please sign in first.', true); if (badge) badge.textContent = origCount; window.location.href = '/users/login/'; return null; }
+    if (response.status === 401) { if (badge) badge.textContent = origCount; window.location.href = '/users/login/'; return null; }
     if (!response.ok) throw new Error('HTTP ' + response.status);
     return response.json();
   })

@@ -39,11 +39,7 @@
     metaColorScheme.content = 'only dark';
     updateBtnIcon(themeId);
     var picker = document.getElementById('theme-picker-dropdown');
-    if (picker) {
-      picker.classList.remove('open');
-      picker.style.display = '';
-      picker.style.gridTemplateColumns = '';
-    }
+    if (picker) picker.classList.remove('open');
     document.dispatchEvent(new CustomEvent('themeChanged'));
   }
 
@@ -247,7 +243,7 @@ function addToCart(event, productId, btnEl, quantity, size) {
     body: JSON.stringify(body)
   })
   .then(response => {
-    if (response.status === 401) { showToast('Please sign in first.', true); if (badge) badge.textContent = origCount; window.location.href = '/users/login/'; return null; }
+    if (response.status === 401) { if (badge) badge.textContent = origCount; window.location.href = '/users/login/'; return null; }
     if (!response.ok) throw new Error('HTTP ' + response.status);
     return response.json();
   })
@@ -550,15 +546,6 @@ function toggleFavorite(event, productId, btn) {
     });
   });
 })();
-// ==============================================================================
-// File: mini_cart.js
-// Description: Mini cart dropdown with hover show/hide and badge-only fallback
-// ==============================================================================
-
-// ==============================================================================
-// SECTION: Mini Cart Data Fetch
-// ==============================================================================
-
 (function(){
   var badgeOnly = !document.getElementById('mini-cart-dropdown');
 
@@ -626,38 +613,18 @@ function toggleFavorite(event, productId, btn) {
       .catch(function() { if (callback) callback(); });
   }
 
-
-
-
-
-  // ==============================================================================
-  // SECTION: Badge-Only Mode
-  // ==============================================================================
-
   if (badgeOnly) {
     window.refreshMiniCart = fetchMiniCart;
     return;
   }
-
-  var wrap = document.querySelector('.cart-dropdown-wrap');
-  var dropdown = document.getElementById('mini-cart-dropdown');
-  var toggleBtn = document.getElementById('cart-toggle-btn');
-  if (!dropdown || !toggleBtn || !wrap) return;
-
-
-
-
-
-  // ==============================================================================
-  // SECTION: Dropdown Show/Hide
-  // ==============================================================================
 
   var hideTimer = null;
   var isHovering = false;
 
   function showDropdown() {
     clearTimeout(hideTimer);
-    if (dropdown.style.display === 'block') return;
+    var dropdown = document.getElementById('mini-cart-dropdown');
+    if (!dropdown || dropdown.style.display === 'block') return;
     fetchMiniCart(function() {
       dropdown.style.display = 'block';
       dropdown.style.opacity = '0';
@@ -673,46 +640,73 @@ function toggleFavorite(event, productId, btn) {
     clearTimeout(hideTimer);
     hideTimer = setTimeout(function() {
       if (!isHovering) {
-        dropdown.style.display = 'none';
+        var d = document.getElementById('mini-cart-dropdown');
+        if (d) d.style.display = 'none';
       }
     }, 200);
   }
 
-  wrap.addEventListener('mouseenter', function() {
-    isHovering = true;
-    clearTimeout(hideTimer);
-    showDropdown();
-  });
+  function initMiniCart() {
+    var wrap = document.querySelector('.cart-dropdown-wrap');
+    var dropdown = document.getElementById('mini-cart-dropdown');
+    var toggleBtn = document.getElementById('cart-toggle-btn');
+    if (!dropdown || !toggleBtn || !wrap) return;
 
-  wrap.addEventListener('mouseleave', function(e) {
-    isHovering = false;
-    hideDropdown();
-  });
+    if (wrap.getAttribute('data-mc-init')) return;
+    wrap.setAttribute('data-mc-init', '1');
 
-  dropdown.addEventListener('mouseenter', function() {
-    isHovering = true;
-    clearTimeout(hideTimer);
-  });
+    wrap.addEventListener('mouseenter', function() {
+      isHovering = true;
+      clearTimeout(hideTimer);
+      showDropdown();
+    });
 
-  dropdown.addEventListener('mouseleave', function() {
-    isHovering = false;
-    hideDropdown();
+    wrap.addEventListener('mouseleave', function(e) {
+      isHovering = false;
+      hideDropdown();
+    });
+
+    toggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var d = document.getElementById('mini-cart-dropdown');
+      if (!d) return;
+      if (d.style.display === 'block') {
+        d.style.display = 'none';
+      } else {
+        showDropdown();
+      }
+    });
+
+    dropdown.addEventListener('mouseenter', function() {
+      isHovering = true;
+      clearTimeout(hideTimer);
+    });
+
+    dropdown.addEventListener('mouseleave', function() {
+      isHovering = false;
+      hideDropdown();
+    });
+
+    document.addEventListener('click', function(e) {
+      var d = document.getElementById('mini-cart-dropdown');
+      if (d && !wrap.contains(e.target) && !d.contains(e.target)) {
+        d.style.display = 'none';
+      }
+    });
+  }
+
+  initMiniCart();
+  document.addEventListener('turbolinks:load', function() {
+    initMiniCart();
+    if (window.refreshMiniCart) window.refreshMiniCart();
   });
 
   window.refreshMiniCart = fetchMiniCart;
-})();
 
-
-
-
-
-// ==============================================================================
-// SECTION: Page Show Handler
-// ==============================================================================
-
-window.addEventListener('pageshow', function(e) {
-  if (window.refreshMiniCart) window.refreshMiniCart();
-});// ==============================================================================
+  window.addEventListener('pageshow', function(e) {
+    if (window.refreshMiniCart) window.refreshMiniCart();
+  });
+})();// ==============================================================================
 // File: messages.js
 // Description: Polls unread message count every 5 seconds
 // ==============================================================================

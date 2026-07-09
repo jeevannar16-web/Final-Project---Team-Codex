@@ -39,11 +39,7 @@
     metaColorScheme.content = 'only dark';
     updateBtnIcon(themeId);
     var picker = document.getElementById('theme-picker-dropdown');
-    if (picker) {
-      picker.classList.remove('open');
-      picker.style.display = '';
-      picker.style.gridTemplateColumns = '';
-    }
+    if (picker) picker.classList.remove('open');
     document.dispatchEvent(new CustomEvent('themeChanged'));
   }
 
