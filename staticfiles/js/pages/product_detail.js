@@ -81,8 +81,13 @@ function shopNow(evt, productId) {
         selectedSize = sizeInput.value;
     }
     var qty = parseInt(document.getElementById('qty-input').value) || 1;
-    addToCart(null, productId, null, qty, selectedSize);
-    window.location.href = '/store/checkout/';
+    var params = 'product_id=' + productId + '&qty=' + qty;
+    if (selectedSize) params += '&size=' + encodeURIComponent(selectedSize);
+    if (window.Turbolinks) {
+        Turbolinks.visit('/store/checkout/?' + params);
+    } else {
+        window.location.href = '/store/checkout/?' + params;
+    }
 }
 
 

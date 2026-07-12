@@ -1,13 +1,13 @@
 """Checkout flow views."""
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import re
 import math
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from ..models import CartItem, Order, OrderItem
+from ..models import CartItem, Order, OrderItem, Product, ProductSize
 from ..activity_logger import log_action
 from users.models import Profile
 import uuid
@@ -41,6 +41,39 @@ def _calc_delivery_charge(distance_km):
 
 @login_required
 def checkout_view(request):
+    product_id = request.GET.get('product_id')
+    if product_id:
+        try:
+            product = get_object_or_404(Product, id=int(product_id))
+            qty = max(1, int(request.GET.get('qty', 1)))
+            size_name = request.GET.get('size') or None
+            if product.has_sizes:
+                if not size_name:
+                    messages.error(request, 'Please select a size.')
+                    return redirect('store:product_detail', product_id=product.id)
+                ps = get_object_or_404(ProductSize, product=product, size=size_name)
+                if ps.stock < qty:
+                    messages.error(request, f'Only {ps.stock} available in size {size_name}!')
+                    return redirect('store:product_detail', product_id=product.id)
+                ps.stock -= qty
+                ps.save()
+            else:
+                if product.stock < qty:
+                    messages.error(request, f'Only {product.stock} available!')
+                    return redirect('store:product_detail', product_id=product.id)
+                product.stock -= qty
+                product.save()
+            cart_item, created = CartItem.objects.get_or_create(
+                user=request.user,
+                product=product,
+                size=size_name or '',
+                defaults={'quantity': 0}
+            )
+            cart_item.quantity += qty
+            cart_item.save()
+        except (ValueError, TypeError):
+            pass
+
     items_param = request.GET.get('items', '').strip()
     if items_param:
         try:
@@ -52,7 +85,7 @@ def checkout_view(request):
         db_items = CartItem.objects.filter(user=request.user)
 
     if not db_items.exists():
-        messages.error(request, "No items selected for checkout.")
+        messages.error(request, "Your bag is empty. Add items before checkout.")
         return redirect('store:cart')
 
     cart_items = []
