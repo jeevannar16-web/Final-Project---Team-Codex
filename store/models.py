@@ -1,5 +1,6 @@
 """Database models for the store app."""
 
+import os
 import mimetypes
 
 from django.db import models
@@ -7,6 +8,14 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
 from django.utils.deconstruct import deconstructible
+
+
+if all(os.environ.get(k) for k in ('CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET')):
+    from cloudinary_storage.storage import RawMediaCloudinaryStorage
+    _message_file_storage = RawMediaCloudinaryStorage()
+else:
+    from django.core.files.storage import FileSystemStorage
+    _message_file_storage = FileSystemStorage()
 
 
 @deconstructible
@@ -339,7 +348,7 @@ class Message(models.Model):
     edited = models.BooleanField(default=False)
     is_pinned = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
-    file = models.FileField(upload_to='chat_files/%Y/%m/%d/', null=True, blank=True)
+    file = models.FileField(upload_to='chat_files/%Y/%m/%d/', null=True, blank=True, storage=_message_file_storage)
     file_type = models.CharField(max_length=20, blank=True)
 
     class Meta:

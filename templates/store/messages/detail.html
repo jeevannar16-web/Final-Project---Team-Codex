@@ -576,14 +576,15 @@
     xhr.send('content=' + encodeURIComponent(text));
   }
 
-  // Enter key sends message
+  // Enter key sends message or file
   if(input){
     input.addEventListener('keydown', function(e){
       if(e.key === 'Enter' && !e.shiftKey){
         e.preventDefault();
-        if(sendBtn.disabled) return;
+        if(sendBtn.disabled || isBlocked) return;
+        if(pendingFile){ uploadFile(); return; }
         var text = this.value.trim();
-        if(text && !isBlocked) sendMessage(text);
+        if(text) sendMessage(text);
       }
     });
   }

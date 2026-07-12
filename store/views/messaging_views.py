@@ -580,17 +580,22 @@ def api_change_theme(request):
 @login_required
 @require_POST
 def api_upload_file(request):
+    import traceback
     conv_id = request.POST.get('conversation_id')
     if not conv_id:
+        logger.warning('upload_file: missing conversation_id from user %s', request.user)
         return JsonResponse({'error': 'conversation_id required'}, status=400)
     conv = get_object_or_404(Conversation, id=conv_id)
     user = request.user
     if user != conv.customer and user != conv.seller and not user.is_staff:
+        logger.warning('upload_file: forbidden user %s for conv %s', user, conv_id)
         return JsonResponse({'error': 'forbidden'}, status=403)
     if 'file' not in request.FILES:
+        logger.warning('upload_file: no file in request from user %s', request.user)
         return JsonResponse({'error': 'No file uploaded'}, status=400)
     uploaded = request.FILES['file']
     if uploaded.size > 20 * 1024 * 1024:
+        logger.warning('upload_file: file too large %s from user %s', uploaded.size, request.user)
         return JsonResponse({'error': 'File must be under 20MB'}, status=400)
 
     mime = uploaded.content_type or ''
@@ -603,18 +608,29 @@ def api_upload_file(request):
     else:
         ftype = 'document'
 
-    msg = Message.objects.create(
-        conversation=conv, sender=user,
-        content=request.POST.get('content', '').strip(),
-        file=uploaded,
-        file_type=ftype,
-    )
+    try:
+        msg = Message.objects.create(
+            conversation=conv, sender=user,
+            content=request.POST.get('content', '').strip(),
+            file=uploaded,
+            file_type=ftype,
+        )
+    except Exception as e:
+        logger.error('upload_file: DB create failed: %s\n%s', e, traceback.format_exc())
+        return JsonResponse({'error': 'Failed to save message'}, status=500)
+
     conv.updated_at = timezone.now()
     conv.save(update_fields=['updated_at'])
+    try:
+        file_url = msg.file.url
+    except Exception as e:
+        logger.error('upload_file: failed to get file_url: %s', e)
+        file_url = None
+
     return JsonResponse({
         'ok': True,
         'message_id': msg.id,
-        'file_url': msg.file.url,
+        'file_url': file_url,
         'file_type': ftype,
         'file_name': uploaded.name,
         'file_size': uploaded.size,

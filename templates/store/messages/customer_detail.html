@@ -460,8 +460,10 @@
     input.addEventListener('keydown', function(e){
       if(e.key === 'Enter' && !e.shiftKey){
         e.preventDefault();
+        if(isBlocked) return;
+        if(pendingFile){ uploadFile(); return; }
         var text = this.value.trim();
-        if(text && !isBlocked) sendMessage(text);
+        if(text) sendMessage(text);
       }
     });
   }

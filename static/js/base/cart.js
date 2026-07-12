@@ -15,7 +15,7 @@ function addToCart(event, productId, btnEl, quantity, size) {
   if (!csrfToken) {
     showToast('Security error: please refresh the page.', true);
     if (btn) { btn.disabled = false; btn.innerHTML = btn.getAttribute('data-orig') || 'ADD TO BAG'; }
-    return Promise.resolve(false);
+    return Promise.reject('No CSRF token');
   }
   var badge = document.getElementById('cart-count');
   var origCount = badge ? parseInt(badge.textContent) || 0 : 0;
@@ -29,13 +29,13 @@ function addToCart(event, productId, btnEl, quantity, size) {
     credentials: 'same-origin',
     body: JSON.stringify(body)
   })
-  .then(response => {
-    if (response.status === 401) { if (badge) badge.textContent = origCount; window.location.href = '/users/login/'; return null; }
+  .then(function(response) {
+    if (response.status === 401) { if (badge) badge.textContent = origCount; window.location.href = '/users/login/'; return Promise.reject('login'); }
     if (!response.ok) throw new Error('HTTP ' + response.status);
     return response.json();
   })
-  .then(data => {
-    if (!data) return false;
+  .then(function(data) {
+    if (!data) return Promise.reject('empty');
     if (data.success) {
       if (badge && data.cart_count !== undefined) badge.textContent = data.cart_count;
       showToast(data.message || '✓ Added to bag!');
@@ -56,19 +56,19 @@ function addToCart(event, productId, btnEl, quantity, size) {
         if (qtyInput) qtyInput.max = data.stock_remaining;
       }
       if (window.refreshMiniCart) setTimeout(window.refreshMiniCart, 100);
-      return true;
+      return data;
     } else {
       showToast(data.message || 'Cannot add this item!', true);
       if (badge) badge.textContent = origCount;
       if (btn) { btn.disabled = false; btn.innerHTML = btn.getAttribute('data-orig') || 'ADD TO BAG'; }
-      return false;
+      return Promise.reject(data.message || 'Cannot add this item');
     }
   })
   .catch(function(error) {
-    showToast('Network error: ' + error.message, true);
+    if (error === 'login' || error === 'No CSRF token') return;
     if (badge) badge.textContent = origCount;
     if (btn) { btn.disabled = false; btn.innerHTML = btn.getAttribute('data-orig') || 'ADD TO BAG'; }
-    return false;
+    return Promise.reject(error);
   });
 }
 
