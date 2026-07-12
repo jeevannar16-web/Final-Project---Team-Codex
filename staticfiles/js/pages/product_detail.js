@@ -81,11 +81,8 @@ function shopNow(evt, productId) {
         selectedSize = sizeInput.value;
     }
     var qty = parseInt(document.getElementById('qty-input').value) || 1;
-    addToCart(null, productId, null, qty, selectedSize).then(function(success) {
-        if (success) {
-            window.location.href = '/store/checkout/';
-        }
-    });
+    addToCart(null, productId, null, qty, selectedSize);
+    window.location.href = '/store/checkout/';
 }
 
 

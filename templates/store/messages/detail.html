@@ -1234,6 +1234,29 @@ function addMessageToBody(m){
 
 // === REACTIONS ===
 function reactToMessage(msgId, emoji){
+  var myUsername = '{{ request.user.username }}';
+  var wrap = document.querySelector('[data-msg-id="' + msgId + '"]');
+  if(wrap){
+    var rDiv = wrap.querySelector('.md-msg-reactions');
+    var current = {};
+    if(rDiv){
+      rDiv.querySelectorAll('.md-reaction-badge').forEach(function(b){
+        var txt = b.textContent.trim();
+        var e = txt.replace(/\s+\d+$/, '');
+        var count = parseInt(b.querySelector('.r-count').textContent) || 0;
+        var isMine = b.classList.contains('mine');
+        var users = [];
+        if(isMine){ users.push(myUsername); for(var i=1;i<count;i++) users.push('_u'+i); }
+        else { for(var i=0;i<count;i++) users.push('_u'+i); }
+        current[e] = users;
+      });
+    }
+    var arr = current[emoji] || [];
+    var idx = arr.indexOf(myUsername);
+    if(idx > -1) arr.splice(idx, 1); else arr.push(myUsername);
+    if(arr.length) current[emoji] = arr; else delete current[emoji];
+    updateReactionsDisplay(msgId, current);
+  }
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{% url "store:api_react_message" %}', true);
   xhr.setRequestHeader('Content-Type', 'application/json');

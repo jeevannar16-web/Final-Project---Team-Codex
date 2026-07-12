@@ -31,10 +31,10 @@
   function applyTheme(themeId) {
     if (themeId === 'system') {
       html.removeAttribute(ATTR);
-      localStorage.removeItem(STORAGE_KEY);
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
     } else {
       html.setAttribute(ATTR, themeId);
-      localStorage.setItem(STORAGE_KEY, themeId);
+      try { localStorage.setItem(STORAGE_KEY, themeId); } catch(e) {}
     }
     metaColorScheme.content = 'only dark';
     updateBtnIcon(themeId);
@@ -102,7 +102,8 @@
   }
 
   // Apply saved theme on startup
-  var saved = localStorage.getItem(STORAGE_KEY);
+  var saved;
+  try { saved = localStorage.getItem(STORAGE_KEY); } catch(e) {}
   if (saved && THEMES.some(function(t) { return t.id === saved; })) {
     applyTheme(saved);
   } else {
