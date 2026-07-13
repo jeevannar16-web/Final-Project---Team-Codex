@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'verification',
     
     # Third-party
+    'channels',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -76,6 +77,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+ASGI_APPLICATION = 'fitness_hub.asgi.application'
 
 ROOT_URLCONF = 'fitness_hub.urls'
 

@@ -406,7 +406,6 @@
   var csrfEl = document.querySelector('[name=csrfmiddlewaretoken]');
   var csrf = csrfEl ? csrfEl.value : '';
   var lastId = 0;
-  var pollTimer = null;
   var statusTimer = null;
 
   /* ── Initial scroll + lastId ── */
@@ -423,37 +422,30 @@
     new MutationObserver(scrollToBottom).observe(body, {childList:true, subtree:true});
   }
 
-  /* ── Auto-resize textarea ── */
+  /* ── Auto-resize textarea + typing ── */
   if(input){
+    var typingTimer = null;
     input.addEventListener('input', function(){
       this.style.height = 'auto';
       this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      if(chatSocket && chatSocket.readyState === WebSocket.OPEN){
+        if(typingTimer) clearTimeout(typingTimer);
+        chatSocket.send(JSON.stringify({type:'typing', is_typing: true}));
+        typingTimer = setTimeout(function(){
+          chatSocket.send(JSON.stringify({type:'typing', is_typing: false}));
+        }, 1500);
+      }
     });
   }
 
-  /* ── Send Message ── */
+  /* ── Send Message (WebSocket) ── */
   function sendMessage(text){
     if(!text || isBlocked) return;
-    sendBtn.disabled = true;
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '', true);
-    xhr.setRequestHeader('X-CSRFToken', csrf);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function(){
-      sendBtn.disabled = false;
-      if(xhr.status === 200){
-        try {
-          var d = JSON.parse(xhr.responseText);
-          if(d.id){ addMessageToBody(d); lastId = d.id; }
-        } catch(e){ window.location.reload(); }
-        input.value = '';
-        input.style.height = 'auto';
-        scrollToBottom();
-      }
-    };
-    xhr.onerror = function(){ sendBtn.disabled = false; };
-    xhr.send('content=' + encodeURIComponent(text));
+    if(chatSocket && chatSocket.readyState === WebSocket.OPEN){
+      chatSocket.send(JSON.stringify({type:'message', content:text}));
+      input.value = '';
+      input.style.height = 'auto';
+    }
   }
 
   if(input){
@@ -554,27 +546,7 @@
     scrollToBottom();
   }
 
-  /* ── Real-time Polling ── */
-  function pollNewMessages(){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '{% url "store:api_new_messages" conversation.id %}?since=' + lastId, true);
-    xhr.onload = function(){
-      if(xhr.status === 200){
-        try{
-          var data = JSON.parse(xhr.responseText);
-          if(data.messages && data.messages.length){
-            data.messages.forEach(function(m){
-              if(m.id > lastId && !m.is_mine){
-                addOtherMessage(m);
-                lastId = m.id;
-              }
-            });
-          }
-        }catch(e){}
-      }
-    };
-    xhr.send();
-  }
+
 
   function addOtherMessage(m){
     if(!body) return;
@@ -646,9 +618,26 @@
     xhr.send(JSON.stringify({user_id: otherUserId}));
   }
 
-  /* ── Start polling ── */
-  pollNewMessages();
-  pollTimer = setInterval(pollNewMessages, 1000);
+  /* ── WebSocket real-time ── */
+  var wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  var chatSocket = null;
+  function connectWebSocket(){
+    chatSocket = new WebSocket(wsScheme + '://' + window.location.host + '/ws/chat/{{ conversation.id }}/');
+    chatSocket.onmessage = function(e){
+      var data = JSON.parse(e.data);
+      if(data.type === 'new_message'){
+        if(data.is_mine){
+          addMessageToBody(data);
+        } else {
+          addOtherMessage(data);
+        }
+        lastId = data.id;
+      }
+    };
+    chatSocket.onclose = function(){ setTimeout(connectWebSocket, 3000); };
+  }
+  connectWebSocket();
+
   pollOnlineStatus();
   statusTimer = setInterval(pollOnlineStatus, 30000);
 
@@ -1025,7 +1014,7 @@
 
   /* ── Cleanup ── */
   window.addEventListener('beforeunload', function(){
-    if(pollTimer) clearInterval(pollTimer);
+    if(chatSocket) chatSocket.close();
     if(statusTimer) clearInterval(statusTimer);
   });
 

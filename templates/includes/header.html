@@ -72,7 +72,7 @@
         </span>
       </a>
 
-      <a href="{% url 'store:cart' %}" class="nav-icon-btn" id="cart-link" title="{{ 'nav.cart'|t }}" style="position:relative; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:12px; width:40px; height:40px; color:#fff; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" onmouseover="this.style.borderColor='#d4af37'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+      <a href="{% url 'store:cart' %}" class="nav-icon-btn" id="cart-link" title="{{ 'Cart'|t }}" style="position:relative; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:12px; width:40px; height:40px; color:#fff; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" onmouseover="this.style.borderColor='#d4af37'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
         <i class="bi bi-bag" style="font-size:1.2rem;"></i>
         <span id="cart-count"
               style="position:absolute; top:-6px; right:-6px; background:#ef4444; color:white; font-size:0.65rem; font-weight:700; min-width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #0d0d0d; box-shadow:0 2px 8px rgba(239,68,68,0.4);">
@@ -93,28 +93,28 @@
         <div class="user-dropdown">
           <button class="nav-icon-btn"><i class="bi bi-person"></i></button>
           <div class="dropdown-content">
-            <a href="{% url 'profile' %}"><i class="bi bi-person-circle" style="margin-right:8px;"></i>{{ 'nav.profile'|t }}</a>
+            <a href="{% url 'profile' %}"><i class="bi bi-person-circle" style="margin-right:8px;"></i>{{ 'Profile'|t }}</a>
             <a href="{% url 'store:messages_list' %}"><i class="bi bi-chat-dots" style="margin-right:8px;"></i>{{ 'Messages'|t }} <span id="msg-badge" style="display:none;background:#d4af37;color:#0d0d0d;font-size:0.6rem;padding:1px 6px;border-radius:8px;margin-left:4px;font-weight:700;"></span></a>
-            <a href="{% url 'store:order_history' %}">📦 {{ 'profile.orders'|t }}</a>
+            <a href="{% url 'store:order_history' %}">📦 {{ 'My Orders'|t }}</a>
             <a href="{% url 'store:seller_center' %}"><i class="bi bi-shop" style="margin-right:8px;"></i>{{ 'Seller Center'|t }}</a>
             {% if user.is_superuser %}
-            <a href="{% url 'store:admin_dashboard' %}"><i class="bi bi-speedometer2" style="margin-right:8px;"></i>{{ 'nav.admin_dashboard'|t }}</a>
+            <a href="{% url 'store:admin_dashboard' %}"><i class="bi bi-speedometer2" style="margin-right:8px;"></i>{{ 'Admin Dashboard'|t }}</a>
             {% endif %}
             {% if user.profile.is_seller or user.is_superuser %}
-            <a href="{% url 'store:seller_dashboard' %}"><i class="bi bi-shop" style="margin-right:8px;"></i>{{ 'nav.seller_dashboard'|t }}</a>
+            <a href="{% url 'store:seller_dashboard' %}"><i class="bi bi-shop" style="margin-right:8px;"></i>{{ 'Seller Dashboard'|t }}</a>
             {% endif %}
             <form method="post" action="{% url 'logout' %}">
               {% csrf_token %}
               <button type="submit" style="color:#ef4444;">
-                <i class="bi bi-box-arrow-right" style="margin-right:8px;"></i>{{ 'nav.logout'|t }}
+                <i class="bi bi-box-arrow-right" style="margin-right:8px;"></i>{{ 'Logout'|t }}
               </button>
             </form>
           </div>
         </div>
       {% else %}
         <a href="{% url 'store:seller_center' %}" class="btn-seller-center">{{ 'Sell'|t }}</a>
-        <a href="{% url 'login' %}" class="btn-login">{{ 'nav.login'|t }}</a>
-        <a href="{% url 'register' %}" class="btn-register">{{ 'nav.register'|t }}</a>
+        <a href="{% url 'login' %}" class="btn-login">{{ 'Login'|t }}</a>
+        <a href="{% url 'register' %}" class="btn-register">{{ 'Register'|t }}</a>
       {% endif %}
     </div>
   </nav>
@@ -136,14 +136,14 @@
       <a href="{% url 'store:favorites_list' %}" class="mobile-nav-item"><i class="bi bi-heart"></i> {{ 'Wishlist'|t }} <span class="mobile-fav-count">({{ global_favorited_ids|length }})</span></a>
       <a href="{% url 'store:cart' %}" class="mobile-nav-item"><i class="bi bi-bag"></i> {{ 'Cart'|t }} <span class="mobile-cart-count">({{ cart_count }})</span></a>
       <a href="{% url 'store:messages_list' %}" class="mobile-nav-item"><i class="bi bi-chat-dots"></i> {{ 'Messages'|t }} <span class="mobile-msg-badge" id="mobile-msg-badge" style="display:none;"></span></a>
-      <a href="{% url 'store:order_history' %}" class="mobile-nav-item"><i class="bi bi-box"></i> {{ 'profile.orders'|t }}</a>
-      <a href="{% url 'profile' %}" class="mobile-nav-item"><i class="bi bi-person"></i> {{ 'nav.profile'|t }}</a>
+      <a href="{% url 'store:order_history' %}" class="mobile-nav-item"><i class="bi bi-box"></i> {{ 'My Orders'|t }}</a>
+      <a href="{% url 'profile' %}" class="mobile-nav-item"><i class="bi bi-person"></i> {{ 'Profile'|t }}</a>
       <a href="{% url 'store:seller_center' %}" class="mobile-nav-item"><i class="bi bi-shop"></i> {{ 'Seller Center'|t }}</a>
       {% if user.profile.is_seller or user.is_superuser %}
-      <a href="{% url 'store:seller_dashboard' %}" class="mobile-nav-item"><i class="bi bi-speedometer2"></i> {{ 'nav.seller_dashboard'|t }}</a>
+      <a href="{% url 'store:seller_dashboard' %}" class="mobile-nav-item"><i class="bi bi-speedometer2"></i> {{ 'Seller Dashboard'|t }}</a>
       {% endif %}
       {% if user.is_superuser %}
-      <a href="{% url 'store:admin_dashboard' %}" class="mobile-nav-item"><i class="bi bi-shield"></i> {{ 'nav.admin_dashboard'|t }}</a>
+      <a href="{% url 'store:admin_dashboard' %}" class="mobile-nav-item"><i class="bi bi-shield"></i> {{ 'Admin Dashboard'|t }}</a>
       {% endif %}
       <div class="mobile-nav-divider"></div>
       <div class="mobile-nav-item" style="flex-wrap:wrap; gap:6px; padding:8px 18px;">
@@ -155,11 +155,11 @@
       {% if user.is_authenticated %}
       <form method="post" action="{% url 'logout' %}" class="mobile-nav-logout-form">
         {% csrf_token %}
-        <button type="submit" class="mobile-nav-item mobile-nav-logout"><i class="bi bi-box-arrow-right"></i> {{ 'nav.logout'|t }}</button>
+        <button type="submit" class="mobile-nav-item mobile-nav-logout"><i class="bi bi-box-arrow-right"></i> {{ 'Logout'|t }}</button>
       </form>
       {% else %}
-      <a href="{% url 'login' %}" class="mobile-nav-item"><i class="bi bi-box-arrow-in-right"></i> {{ 'nav.login'|t }}</a>
-      <a href="{% url 'register' %}" class="mobile-nav-item mobile-nav-register"><i class="bi bi-person-plus"></i> {{ 'nav.register'|t }}</a>
+      <a href="{% url 'login' %}" class="mobile-nav-item"><i class="bi bi-box-arrow-in-right"></i> {{ 'Login'|t }}</a>
+      <a href="{% url 'register' %}" class="mobile-nav-item mobile-nav-register"><i class="bi bi-person-plus"></i> {{ 'Register'|t }}</a>
       {% endif %}
     </div>
   </nav>

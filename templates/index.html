@@ -6,7 +6,7 @@
 {% load cache %}
 {% load store_extras %}
 
-{% block title %}FITNESS HUB — {{ 'home.hero_title'|t }}{% endblock %}
+{% block title %}FITNESS HUB — {{ 'Premium Fitness Gear'|t }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/index.css' %}">
@@ -57,10 +57,10 @@
 <section class="hero">
   <div class="hero-container">
     <div>
-      <span class="new-badge">{{ 'home.new_arrivals'|t }}</span>
-      <h1>{{ 'home.hero_title'|t }}</h1>
-      <p class="hero-sub">{{ 'home.hero_subtitle'|t }}</p>
-      <a href="{% url 'store:product_list' %}" class="btn-shop-now">{{ 'home.shop_now'|t }} →</a>
+      <span class="new-badge">{{ 'New Arrivals'|t }}</span>
+      <h1>{{ 'Premium Fitness Gear'|t }}</h1>
+      <p class="hero-sub">{{ 'Curated fitness goods, beautifully delivered. Find what moves you.'|t }}</p>
+      <a href="{% url 'store:product_list' %}" class="btn-shop-now">{{ 'Shop Now'|t }} →</a>
     </div>
     <div class="hero-divider"></div>
     <div class="hero-visual">
@@ -438,7 +438,7 @@
 <!-- ═══ FEATURED PRODUCTS GRID (with Load More) ═══ -->
 <section class="feat-section">
   <div class="section-hd">
-    <h2><i class="bi bi-collection"></i> {{ 'home.featured'|t }}</h2>
+    <h2><i class="bi bi-collection"></i> {{ 'Featured Products'|t }}</h2>
   </div>
   <div class="feat-grid" id="products-container">
     {% for product in featured_products %}

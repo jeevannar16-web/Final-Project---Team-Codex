@@ -57,12 +57,12 @@
           {% if user.is_authenticated %}
           <li>
             <a href="{% url 'profile' %}">
-              <span class="ft-arrow">›</span>{{ 'nav.profile'|t }}
+              <span class="ft-arrow">›</span>{{ 'Profile'|t }}
             </a>
           </li>
           <li>
             <a href="{% url 'store:order_history' %}">
-              <span class="ft-arrow">›</span>{{ 'profile.orders'|t }}
+              <span class="ft-arrow">›</span>{{ 'My Orders'|t }}
             </a>
           </li>
           <li>
