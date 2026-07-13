@@ -233,7 +233,5 @@ else:
     print('Google OAuth placeholder created (set GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET env vars)')
 " 2>&1
 
-# Reduce workers for free tier (Render caps at 1 CPU)
-exec gunicorn fitness_hub.wsgi:application \
-  --workers=1 --threads=4 --worker-class=gthread \
-  --timeout 120 --keep-alive 60
+# ASGI server for WebSocket support
+exec daphne -b 0.0.0.0 -p ${PORT:-8000} fitness_hub.asgi:application
