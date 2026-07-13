@@ -3,6 +3,7 @@
 import threading
 
 from django.conf import settings
+from django.core.cache import cache
 
 from .models import Language
 
@@ -32,17 +33,19 @@ class LanguageMiddleware:
         return response
 
     def _resolve_language(self, request):
-        path_parts = request.path_info.split('/')
-        if len(path_parts) > 1 and path_parts[1]:
+        codes = cache.get('active_language_codes')
+        if codes is None:
             codes = dict(Language.objects.filter(is_active=True).values_list('code', 'code'))
-            if path_parts[1] in codes:
-                return path_parts[1]
+            cache.set('active_language_codes', codes, 86400)
+        path_parts = request.path_info.split('/')
+        if len(path_parts) > 1 and path_parts[1] in codes:
+            return path_parts[1]
         lang = request.GET.get('lang')
-        if lang and Language.objects.filter(code=lang, is_active=True).exists():
+        if lang in codes:
             return lang
         if hasattr(request, 'session') and request.session.get('django_language'):
             return request.session['django_language']
         lang = request.COOKIES.get('django_language')
-        if lang and Language.objects.filter(code=lang, is_active=True).exists():
+        if lang in codes:
             return lang
         return settings.LANGUAGE_CODE

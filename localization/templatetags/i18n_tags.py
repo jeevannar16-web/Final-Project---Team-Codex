@@ -14,8 +14,9 @@ register = template.Library()
 @register.simple_tag(takes_context=True)
 def trans(context, key, default=None, **params):
     lang_code = context.get('LANGUAGE_CODE') or settings.LANGUAGE_CODE
-    t = Translator(lang_code)
-    return t.get(key, default, params=params or None)
+    if lang_code not in _translator_cache:
+        _translator_cache[lang_code] = Translator(lang_code)
+    return _translator_cache[lang_code].get(key, default, params=params or None)
 
 
 @register.simple_tag(takes_context=True)
@@ -35,12 +36,14 @@ def ttrans(key, lang_code):
     key = str(key) if not isinstance(key, str) else key
     return t.get(key)
 
-_cur_lang = None
+_translator_cache = {}
 
 @register.filter
 def t(key):
     lang_code = get_current_language()
-    tr = Translator(lang_code)
+    if lang_code not in _translator_cache:
+        _translator_cache[lang_code] = Translator(lang_code)
+    tr = _translator_cache[lang_code]
     key = str(key) if not isinstance(key, str) else key
     return tr.get(key)
 
