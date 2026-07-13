@@ -648,7 +648,7 @@
 
   /* ── Start polling ── */
   pollNewMessages();
-  pollTimer = setInterval(pollNewMessages, 2500);
+  pollTimer = setInterval(pollNewMessages, 1000);
   pollOnlineStatus();
   statusTimer = setInterval(pollOnlineStatus, 30000);
 

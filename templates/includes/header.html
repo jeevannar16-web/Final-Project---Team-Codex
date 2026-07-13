@@ -3,32 +3,14 @@
 <!-- ========================================================================= -->
 {% load static %}
 <nav class="main-nav">
-    <!-- Left: Logo, Language Switcher, Mobile Menu Toggle -->
+    <!-- Left: Logo, Mobile Menu Toggle -->
     <div class="nav-left-brand">
       <a href="{% url 'home' %}" class="nav-logo">
         <img src="{% static 'images/logo.webp' %}" alt="FitnessHub" class="logo-img">
       </a>
-      <div class="nav-lang-split"></div>
       <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
-      <div class="nav-lang">
-        <button class="nav-lang-btn">
-          <span class="nav-lang-flag">{{ LANGUAGE_CODE|slice:":2"|upper }}</span>
-          <svg class="nav-lang-chev" width="8" height="5" viewBox="0 0 8 5" fill="none"><path d="M1 1l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="nav-lang-drop">
-          {% for lang in available_languages %}
-          <a href="?lang={{ lang.code }}" class="nav-lang-opt{% if LANGUAGE_CODE|slice:':2' == lang.code %} nav-lang-opt-on{% endif %}">
-            <span class="nav-lang-opt-flag">{{ lang.flag_icon }}</span>
-            <span class="nav-lang-opt-name">{{ lang.name }}</span>
-            {% if LANGUAGE_CODE|slice:':2' == lang.code %}
-            <svg class="nav-lang-opt-check" width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            {% endif %}
-          </a>
-          {% endfor %}
-        </div>
-      </div>
     </div>
 
     <!-- Center: Search Bar with Autocomplete -->
@@ -168,15 +150,7 @@
         <span style="width:100%; color:#666; font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">{{ 'Theme'|t }}</span>
         <div id="mobile-theme-options" style="display:flex; flex-wrap:wrap; gap:4px; width:100%;"></div>
       </div>
-      <div class="mobile-nav-item" style="flex-wrap:wrap; gap:6px; padding:8px 18px;">
-        <span style="width:100%; color:#666; font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">{{ 'Language'|t }}</span>
-        {% for lang in available_languages %}
-        <a href="?lang={{ lang.code }}" class="mobile-nav-lang" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(255,255,255,0.04);border-radius:6px;color:#ccc;text-decoration:none;font-size:0.78rem;{% if LANGUAGE_CODE|slice:':2' == lang.code %}background:rgba(212,175,55,0.12);color:#d4af37;{% endif %}">
-          <span>{{ lang.flag_icon }}</span>
-          <span>{{ lang.name }}</span>
-        </a>
-        {% endfor %}
-      </div>
+
       <div class="mobile-nav-divider"></div>
       {% if user.is_authenticated %}
       <form method="post" action="{% url 'logout' %}" class="mobile-nav-logout-form">

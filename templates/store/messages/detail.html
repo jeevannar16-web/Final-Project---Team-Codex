@@ -849,8 +849,8 @@
     xhr.send();
   }
 
-  var msgInterval = setInterval(pollMessages, 2500);
-  var reactInterval = setInterval(pollReactions, 3000);
+  var msgInterval = setInterval(pollMessages, 1000);
+  var reactInterval = setInterval(pollReactions, 2000);
   document.addEventListener('turbolinks:before-visit', function(){
     clearInterval(msgInterval);
     clearInterval(reactInterval);
