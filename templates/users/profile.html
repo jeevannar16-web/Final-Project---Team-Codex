@@ -13,8 +13,6 @@
 
 {% block content %}
 <div class="profile-wrap">
-<form method="POST" enctype="multipart/form-data" data-turbolinks="false" id="profile-form">
-{% csrf_token %}
   <div class="profile-header-card">
     <div class="profile-avatar" id="avatar-wrap">
       {% if profile.avatar %}
@@ -28,7 +26,7 @@
     </div>
     <div class="profile-header-info">
       <div class="name-edit-wrap">
-        <input type="text" id="display-name" name="username" value="{{ request.user.username }}" readonly>
+        <input type="text" id="display-name" name="username" value="{{ request.user.username }}" readonly form="profile-form">
         <button type="button" class="name-edit-btn" id="name-edit-toggle" title="{{ 'Edit name'|t }}">
           <i class="bi bi-pencil-fill"></i>
         </button>
@@ -51,6 +49,8 @@
   </div>
 
   <div id="tab-info" class="tab-panel active">
+    <form method="POST" enctype="multipart/form-data" data-turbolinks="false" id="profile-form">
+    {% csrf_token %}
     <div class="profile-section">
       <div class="section-hd">
         <h3><i class="bi bi-person"></i> {{ 'Personal Information'|t }}</h3>
