@@ -559,14 +559,33 @@
     });
   }
 
-  // === SEND MESSAGE VIA WEBSOCKET ===
+  // === SEND MESSAGE (WebSocket with AJAX fallback) ===
   function sendMessage(text){
     if(!text || isBlocked) return;
-    if(chatSocket.readyState === WebSocket.OPEN){
+    if(chatSocket && chatSocket.readyState === WebSocket.OPEN){
       chatSocket.send(JSON.stringify({type:'message', content:text}));
       input.value = '';
       input.style.height = 'auto';
+      return;
     }
+    // Fallback to AJAX POST
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '', true);
+    xhr.setRequestHeader('X-CSRFToken', csrf);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function(){
+      if(xhr.status === 200){
+        try {
+          var d = JSON.parse(xhr.responseText);
+          if(d.id){ addMessageToBody(d); lastId = d.id; }
+        } catch(e){ location.reload(); }
+        input.value = '';
+        input.style.height = 'auto';
+        scrollToBottom();
+      }
+    };
+    xhr.send('content=' + encodeURIComponent(text));
   }
 
   // Enter key sends message or file
