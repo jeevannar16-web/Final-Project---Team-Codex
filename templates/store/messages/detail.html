@@ -848,6 +848,61 @@
 
   connectWebSocket();
 
+  // === FALLBACK POLLING (ensures delivery if WebSocket drops) ===
+  function pollMessages(){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{% url "store:api_new_messages" conversation.id %}?since=' + lastId, true);
+    xhr.onload = function(){
+      if(xhr.status !== 200) return;
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if(!data.messages || !data.messages.length) return;
+        var empty = body.querySelector('.md-empty');
+        if(empty) empty.remove();
+        data.messages.forEach(function(m){
+          if(m.id <= lastId) return;
+          addMessageToBody(m);
+          lastId = m.id;
+        });
+        body.scrollTop = body.scrollHeight;
+        if(document.hidden && Notification && Notification.permission === 'granted'){
+          var lastMsg = data.messages[data.messages.length - 1];
+          if(!lastMsg.is_mine){
+            new Notification('{{ other_user.username }}', {body: lastMsg.content, icon: '/static/favicon.ico'});
+          }
+        }
+      } catch(e){}
+    };
+    xhr.send();
+  }
+
+  function pollReactions(){
+    var msgWraps = body.querySelectorAll('.md-msg-wrap[data-msg-id]');
+    if(!msgWraps.length) return;
+    var ids = [];
+    msgWraps.forEach(function(w){ ids.push(w.getAttribute('data-msg-id')); });
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{% url "store:api_reaction_updates" conversation.id %}?ids=' + ids.join(','), true);
+    xhr.onload = function(){
+      if(xhr.status !== 200) return;
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if(!data || !data.reactions) return;
+        Object.keys(data.reactions).forEach(function(msgId){
+          updateReactionsDisplay(parseInt(msgId), data.reactions[msgId]);
+        });
+      } catch(e){}
+    };
+    xhr.send();
+  }
+
+  var pollInterval = setInterval(pollMessages, 3000);
+  var reactInterval = setInterval(pollReactions, 2000);
+  document.addEventListener('turbolinks:before-visit', function(){
+    clearInterval(pollInterval);
+    clearInterval(reactInterval);
+  });
+
   if('Notification' in window && Notification.permission === 'default'){
     Notification.requestPermission();
   }

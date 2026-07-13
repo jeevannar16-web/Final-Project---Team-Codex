@@ -8,6 +8,8 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 from store.models import Conversation, Message, Product, BlockedUser, UserOnline, MessageReport
 from store.activity_logger import log_action
 from django.contrib.auth.models import User
@@ -144,6 +146,21 @@ def conversation_detail(request, conversation_id):
             msg = Message.objects.create(conversation=conv, sender=user, content=content)
             conv.updated_at = timezone.now()
             conv.save(update_fields=['updated_at'])
+            # Broadcast to WebSocket group
+            try:
+                layer = get_channel_layer()
+                async_to_sync(layer.group_send)(
+                    f'chat_{conv.id}',
+                    {
+                        'type': 'chat_message',
+                        'id': msg.id,
+                        'sender': user.username,
+                        'content': msg.content,
+                        'created_at': msg.created_at.strftime('%H:%M'),
+                    }
+                )
+            except Exception:
+                pass
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'id': msg.id,

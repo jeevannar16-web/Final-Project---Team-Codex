@@ -656,6 +656,29 @@
   }
   connectWebSocket();
 
+  // === FALLBACK POLLING ===
+  function pollNewMessages(){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{% url "store:api_new_messages" conversation.id %}?since=' + lastId, true);
+    xhr.onload = function(){
+      if(xhr.status === 200){
+        try{
+          var data = JSON.parse(xhr.responseText);
+          if(data.messages && data.messages.length){
+            data.messages.forEach(function(m){
+              if(m.id > lastId && !m.is_mine){
+                addOtherMessage(m);
+                lastId = m.id;
+              }
+            });
+          }
+        }catch(e){}
+      }
+    };
+    xhr.send();
+  }
+  var pollTimer = setInterval(pollNewMessages, 3000);
+
   pollOnlineStatus();
   statusTimer = setInterval(pollOnlineStatus, 30000);
 
@@ -1033,6 +1056,7 @@
   /* ── Cleanup ── */
   window.addEventListener('beforeunload', function(){
     if(chatSocket) chatSocket.close();
+    clearInterval(pollTimer);
     if(statusTimer) clearInterval(statusTimer);
   });
 
