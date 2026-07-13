@@ -216,7 +216,7 @@
                             <button type="button" class="btn-add-bag" onclick="addToCartWithSize(event, {{ product.id }})">
                                 {{ 'ADD TO BAG'|t }}
                             </button>
-                            <button type="button" class="btn-shop-now" onclick="addToCartWithSize(event, {{ product.id }})">
+                            <button type="button" class="btn-shop-now" onclick="shopNow(event, {{ product.id }})">
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 2L4 14h6v8l9-12h-6z"/></svg>
                                 {{ 'SHOP NOW'|t }}
                             </button>
@@ -389,7 +389,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/product_detail.js' %}?v=2"></script>
+<script src="{% static 'js/pages/product_detail.js' %}?v=3"></script>
 <script>
 document.querySelectorAll('.btn-add-bag, .btn-shop-now').forEach(function(b){
   if (!b.getAttribute('data-orig')) b.setAttribute('data-orig', b.innerHTML.trim());

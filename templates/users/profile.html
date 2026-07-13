@@ -54,7 +54,7 @@
         <h3><i class="bi bi-person"></i> {{ 'Personal Information'|t }}</h3>
       </div>
       <div class="section-bd">
-        <form method="POST" enctype="multipart/form-data" data-turbolinks="false">
+        <form method="POST" enctype="multipart/form-data" data-turbolinks="false" onsubmit="document.getElementById('username-input').value = document.getElementById('display-name').textContent.trim()">
           {% csrf_token %}
           <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display:none;">
           <input type="hidden" name="username" id="username-input" value="{{ request.user.username }}">
