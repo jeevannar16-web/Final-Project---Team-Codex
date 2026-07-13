@@ -99,116 +99,98 @@ def add_to_cart(request, product_id):
 
 
 
+@login_required
 def cart_view(request):
     cart_items = []
     subtotal = 0.0
 
     filters = {}
-    if request.user.is_authenticated:
-        db_items = CartItem.objects.filter(user=request.user)
 
-        cat = request.GET.get('category', '').strip()
-        if cat:
-            db_items = db_items.filter(product__category__name__iexact=cat)
+    db_items = CartItem.objects.filter(user=request.user)
 
-        seller = request.GET.get('seller', '').strip()
-        if seller:
-            db_items = db_items.filter(product__seller__username__iexact=seller)
+    cat = request.GET.get('category', '').strip()
+    if cat:
+        db_items = db_items.filter(product__category__name__iexact=cat)
 
-        price_min = request.GET.get('price_min', '').strip()
-        if price_min:
-            try:
-                db_items = db_items.filter(product__price__gte=float(price_min))
-            except ValueError:
-                pass
+    seller = request.GET.get('seller', '').strip()
+    if seller:
+        db_items = db_items.filter(product__seller__username__iexact=seller)
 
-        price_max = request.GET.get('price_max', '').strip()
-        if price_max:
-            try:
-                db_items = db_items.filter(product__price__lte=float(price_max))
-            except ValueError:
-                pass
+    price_min = request.GET.get('price_min', '').strip()
+    if price_min:
+        try:
+            db_items = db_items.filter(product__price__gte=float(price_min))
+        except ValueError:
+            pass
 
-        date_from = request.GET.get('date_from', '').strip()
-        if date_from:
-            try:
-                dt = datetime.strptime(date_from, '%Y-%m-%d')
-                db_items = db_items.filter(added_at__gte=dt)
-            except ValueError:
-                pass
+    price_max = request.GET.get('price_max', '').strip()
+    if price_max:
+        try:
+            db_items = db_items.filter(product__price__lte=float(price_max))
+        except ValueError:
+            pass
 
-        date_to = request.GET.get('date_to', '').strip()
-        if date_to:
-            try:
-                dt = datetime.strptime(date_to + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
-                db_items = db_items.filter(added_at__lte=dt)
-            except ValueError:
-                pass
+    date_from = request.GET.get('date_from', '').strip()
+    if date_from:
+        try:
+            dt = datetime.strptime(date_from, '%Y-%m-%d')
+            db_items = db_items.filter(added_at__gte=dt)
+        except ValueError:
+            pass
 
-        sort = request.GET.get('sort', '').strip()
-        if sort == 'price_asc':
-            db_items = db_items.order_by('product__price')
-        elif sort == 'price_desc':
-            db_items = db_items.order_by('-product__price')
-        elif sort == 'newest':
-            db_items = db_items.order_by('-added_at')
-        elif sort == 'oldest':
-            db_items = db_items.order_by('added_at')
-        elif sort == 'name_asc':
-            db_items = db_items.order_by('product__name')
-        elif sort == 'qty_desc':
-            db_items = db_items.order_by('-quantity')
-        else:
-            db_items = db_items.order_by('-added_at')
+    date_to = request.GET.get('date_to', '').strip()
+    if date_to:
+        try:
+            dt = datetime.strptime(date_to + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+            db_items = db_items.filter(added_at__lte=dt)
+        except ValueError:
+            pass
 
-        for item in db_items:
-            item_total = float(item.product.price) * int(item.quantity)
-            subtotal += item_total
-            cart_items.append({
-                'product': item.product,
-                'quantity': item.quantity,
-                'total_price': item_total,
-                'id': item.id,
-                'size': item.size or None,
-                'added_at': item.added_at,
-            })
-
-        cats_in_cart = Category.objects.filter(
-            products__cartitem__user=request.user
-        ).distinct()
-        sellers_in_cart = Product.objects.filter(
-            cartitem__user=request.user
-        ).values_list('seller__username', flat=True).distinct()
-        filters = {
-            'categories': cats_in_cart,
-            'sellers': sellers_in_cart,
-            'current_category': request.GET.get('category', ''),
-            'current_seller': request.GET.get('seller', ''),
-            'current_price_min': request.GET.get('price_min', ''),
-            'current_price_max': request.GET.get('price_max', ''),
-            'current_date_from': request.GET.get('date_from', ''),
-            'current_date_to': request.GET.get('date_to', ''),
-            'current_sort': request.GET.get('sort', ''),
-        }
+    sort = request.GET.get('sort', '').strip()
+    if sort == 'price_asc':
+        db_items = db_items.order_by('product__price')
+    elif sort == 'price_desc':
+        db_items = db_items.order_by('-product__price')
+    elif sort == 'newest':
+        db_items = db_items.order_by('-added_at')
+    elif sort == 'oldest':
+        db_items = db_items.order_by('added_at')
+    elif sort == 'name_asc':
+        db_items = db_items.order_by('product__name')
+    elif sort == 'qty_desc':
+        db_items = db_items.order_by('-quantity')
     else:
-        session_cart = request.session.get('cart', {})
-        for product_id, data in session_cart.items():
-            try:
-                product = Product.objects.get(id=int(product_id))
-                qty = data['qty'] if isinstance(data, dict) else data
-                sz = data.get('size') if isinstance(data, dict) else None
-                item_total = float(product.price) * int(qty)
-                subtotal += item_total
-                cart_items.append({
-                    'product': product,
-                    'quantity': qty,
-                    'total_price': item_total,
-                    'id': product.id,
-                    'size': sz,
-                    'added_at': None,
-                })
-            except Product.DoesNotExist:
-                continue
+        db_items = db_items.order_by('-added_at')
+
+    for item in db_items:
+        item_total = float(item.product.price) * int(item.quantity)
+        subtotal += item_total
+        cart_items.append({
+            'product': item.product,
+            'quantity': item.quantity,
+            'total_price': item_total,
+            'id': item.id,
+            'size': item.size or None,
+            'added_at': item.added_at,
+        })
+
+    cats_in_cart = Category.objects.filter(
+        products__cartitem__user=request.user
+    ).distinct()
+    sellers_in_cart = Product.objects.filter(
+        cartitem__user=request.user
+    ).values_list('seller__username', flat=True).distinct()
+    filters = {
+        'categories': cats_in_cart,
+        'sellers': sellers_in_cart,
+        'current_category': request.GET.get('category', ''),
+        'current_seller': request.GET.get('seller', ''),
+        'current_price_min': request.GET.get('price_min', ''),
+        'current_price_max': request.GET.get('price_max', ''),
+        'current_date_from': request.GET.get('date_from', ''),
+        'current_date_to': request.GET.get('date_to', ''),
+        'current_sort': request.GET.get('sort', ''),
+    }
 
     promo_code = request.GET.get('promo_code', '').strip().upper()
     promo_applied = False
