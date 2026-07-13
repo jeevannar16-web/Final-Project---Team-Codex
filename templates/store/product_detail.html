@@ -389,7 +389,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/product_detail.js' %}"></script>
+<script src="{% static 'js/pages/product_detail.js' %}?v=2"></script>
 <script>
 document.querySelectorAll('.btn-add-bag, .btn-shop-now').forEach(function(b){
   if (!b.getAttribute('data-orig')) b.setAttribute('data-orig', b.innerHTML.trim());
