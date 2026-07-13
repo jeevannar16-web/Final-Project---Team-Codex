@@ -8,7 +8,7 @@
 {% block title %}My Account — FITNESS HUB{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/profile.css' %}?v=4">
+<link rel="stylesheet" href="{% static 'css/pages/profile.css' %}?v=5">
 {% endblock %}
 
 {% block content %}
@@ -26,7 +26,7 @@
     </div>
     <div class="profile-header-info">
       <div class="name-edit-wrap">
-        <h1 id="display-name">{{ request.user.username }}</h1>
+        <input type="text" id="display-name" name="username" value="{{ request.user.username }}" readonly>
         <button type="button" class="name-edit-btn" id="name-edit-toggle" title="{{ 'Edit name'|t }}">
           <i class="bi bi-pencil-fill"></i>
         </button>
@@ -54,10 +54,10 @@
         <h3><i class="bi bi-person"></i> {{ 'Personal Information'|t }}</h3>
       </div>
       <div class="section-bd">
-        <form method="POST" enctype="multipart/form-data" data-turbolinks="false" onsubmit="document.getElementById('username-input').value = document.getElementById('display-name').textContent.trim()">
+        <form method="POST" enctype="multipart/form-data" data-turbolinks="false">
           {% csrf_token %}
           <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display:none;">
-          <input type="hidden" name="username" id="username-input" value="{{ request.user.username }}">
+          <input type="hidden" name="old_username" id="username-input" value="{{ request.user.username }}">
           <div class="profile-form-grid">
             <div class="form-field">
               <label>{{ 'Phone'|t }}</label>
@@ -301,22 +301,21 @@ document.addEventListener('click', function(e){
 (function(){
   var toggle = document.getElementById('name-edit-toggle');
   var display = document.getElementById('display-name');
-  var input = document.getElementById('username-input');
-  if(toggle && display && input){
+  if(toggle && display){
     toggle.addEventListener('click', function(){
       if(toggle.dataset.editing === 'true'){
-        display.contentEditable = false;
+        display.readOnly = true;
         display.style.borderBottom = 'none';
         display.style.padding = '0';
-        input.value = display.textContent.trim();
         toggle.innerHTML = '<i class="bi bi-pencil-fill"></i>';
         toggle.title = '{{ "Edit name"|t }}';
         toggle.dataset.editing = 'false';
       } else {
-        display.contentEditable = true;
+        display.readOnly = false;
         display.style.borderBottom = '2px solid var(--clr-accent)';
         display.style.padding = '0 0 2px';
         display.focus();
+        display.select();
         toggle.innerHTML = '<i class="bi bi-check-lg"></i>';
         toggle.title = '{{ "Save name"|t }}';
         toggle.dataset.editing = 'true';

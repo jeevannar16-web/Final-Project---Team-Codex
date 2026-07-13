@@ -157,6 +157,22 @@
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
+#display-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f0ece4;
+  background: transparent;
+  border: none;
+  outline: none;
+  border-bottom: 2px solid transparent;
+  padding: 0;
+  font-family: inherit;
+  line-height: 1.3;
+  min-width: 120px;
+}
+#display-name:focus {
+  border-bottom-color: var(--clr-accent, #d4af37);
+}
 
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
