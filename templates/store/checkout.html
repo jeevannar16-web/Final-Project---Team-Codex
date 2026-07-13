@@ -270,7 +270,7 @@
 
 {% block extra_js %}
 <script src="{% static 'js/pages/checkout.js' %}"></script>
-<script src="{% static 'js/pages/checkout_map.js' %}?v=3"></script>
+<script src="{% static 'js/pages/checkout_map.js' %}?v=3" defer></script>
 <script>
 var baseDeliveryCharge = {{ delivery_charge|default:'0' }};
 var totalAmount = {{ total_amount|default:'0' }};
