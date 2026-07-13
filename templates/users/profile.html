@@ -26,7 +26,7 @@
     </div>
     <div class="profile-header-info">
       <div class="name-edit-wrap">
-        <input type="text" id="display-name" name="username" value="{{ request.user.username }}" readonly>
+        <input type="text" id="display-name" name="username" value="{{ request.user.username }}" readonly form="profile-form">
         <button type="button" class="name-edit-btn" id="name-edit-toggle" title="{{ 'Edit name'|t }}">
           <i class="bi bi-pencil-fill"></i>
         </button>
@@ -54,10 +54,9 @@
         <h3><i class="bi bi-person"></i> {{ 'Personal Information'|t }}</h3>
       </div>
       <div class="section-bd">
-        <form method="POST" enctype="multipart/form-data" data-turbolinks="false">
+        <form method="POST" enctype="multipart/form-data" data-turbolinks="false" id="profile-form">
           {% csrf_token %}
           <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display:none;">
-          <input type="hidden" name="old_username" id="username-input" value="{{ request.user.username }}">
           <div class="profile-form-grid">
             <div class="form-field">
               <label>{{ 'Phone'|t }}</label>
