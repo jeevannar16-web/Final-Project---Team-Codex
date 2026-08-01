@@ -39,7 +39,7 @@
 
   // Show on initial page load
   if (document.readyState === 'loading') {
-    showFull();
+    showBar();
   } else {
     hide();
   }
@@ -48,7 +48,7 @@
   document.addEventListener('submit', function (e) {
     if (e.defaultPrevented) return;
     if (e.target.getAttribute('data-no-loader') === 'true') return;
-    showFull();
+    showBar();
   });
 
   function verifyOnline() {

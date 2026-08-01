@@ -165,13 +165,13 @@ def product_list(request):
 @cache_anon(300, key_prefix='pd')
 @cache_control(max_age=300, private=True)
 def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    recommendations = Product.objects.filter(
+    product = get_object_or_404(Product.objects.select_related('category'), id=product_id)
+    recommendations = Product.objects.select_related('category').filter(
         category=product.category
     ).exclude(id=product.id)[:4]
     
     if not recommendations.exists():
-        recommendations = Product.objects.exclude(id=product.id)[:4]
+        recommendations = Product.objects.select_related('category').exclude(id=product.id)[:4]
 
     is_favorited = False
     user_review = None
@@ -264,12 +264,12 @@ def sale_catalog(request):
     price_max = request.GET.get('price_max', '')
     active_sort = request.GET.get('sort', '')
 
-    products = Product.objects.filter(is_sale=True).order_by('id')
+    products = Product.objects.select_related('category').filter(is_sale=True).order_by('id')
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    recommendations = Product.objects.filter(is_featured=True)[:4]
+    recommendations = Product.objects.select_related('category').filter(is_featured=True)[:4]
 
     context = {
         'products': page_obj,

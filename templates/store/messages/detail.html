@@ -815,9 +815,12 @@
 
   var wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
   var chatSocket = null;
+  var wsConnected = false;
 
   function connectWebSocket(){
     chatSocket = new WebSocket(wsScheme + '://' + window.location.host + '/ws/chat/{{ conversation.id }}/');
+    chatSocket.onopen = function(){ wsConnected = true; };
+    chatSocket.onclose = function(){ wsConnected = false; setTimeout(connectWebSocket, 3000); };
     chatSocket.onmessage = function(e){
       var data = JSON.parse(e.data);
       if(data.type === 'new_message'){
@@ -848,8 +851,9 @@
 
   connectWebSocket();
 
-  // === FALLBACK POLLING (ensures delivery if WebSocket drops) ===
+  // === FALLBACK POLLING (only when WebSocket is disconnected) ===
   function pollMessages(){
+    if(wsConnected) return;
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '{% url "store:api_new_messages" conversation.id %}?since=' + lastId, true);
     xhr.onload = function(){
@@ -877,6 +881,7 @@
   }
 
   function pollReactions(){
+    if(wsConnected) return;
     var msgWraps = body.querySelectorAll('.md-msg-wrap[data-msg-id]');
     if(!msgWraps.length) return;
     var ids = [];
