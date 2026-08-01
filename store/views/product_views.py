@@ -259,6 +259,8 @@ def product_list_api(request):
     })
 
 
+@cache_anon(900, key_prefix='sale')
+@cache_control(max_age=300, private=True)
 def sale_catalog(request):
     price_min = request.GET.get('price_min', '')
     price_max = request.GET.get('price_max', '')
