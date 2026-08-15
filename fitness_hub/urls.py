@@ -8,7 +8,13 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
+from django.views.decorators.http import require_GET
 from .sitemaps import StaticViewSitemap, ProductSitemap, CategorySitemap
+
+
+@require_GET
+def health_check(request):
+    return HttpResponse('ok', content_type='text/plain')
 
 
 sitemaps = {
@@ -27,6 +33,7 @@ urlpatterns = [
     path('verify/', include('verification.urls')),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('health', health_check, name='health_check'),
     path('google303d3f39c4a640fc.html', lambda r: HttpResponse('google-site-verification: google303d3f39c4a640fc.html', content_type='text/plain')),
 ]
 
