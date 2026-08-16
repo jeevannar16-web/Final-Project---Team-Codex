@@ -8,11 +8,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_http_methods
 from .sitemaps import StaticViewSitemap, ProductSitemap, CategorySitemap
 
 
-@require_GET
+@require_http_methods(["GET", "HEAD"])
 def health_check(request):
     return HttpResponse('ok', content_type='text/plain')
 
