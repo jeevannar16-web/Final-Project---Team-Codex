@@ -11,6 +11,7 @@
     var badge = document.getElementById('msg-badge');
     if (!badge) return;
     function check(){
+        if (document.hidden) return;
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/store/api/messages/unread/', true);
         xhr.onload = function(){
@@ -28,6 +29,7 @@
         xhr.send();
     }
     check();
-    var interval = setInterval(check, 5000);
+    var interval = setInterval(check, 60000);
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) check(); });
     document.addEventListener('turbolinks:before-visit', function(){ clearInterval(interval); });
 })();

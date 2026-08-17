@@ -13,8 +13,6 @@ class LanguageMiddleware:
 
     def __call__(self, request):
         request.LANGUAGE_CODE = 'en'
-        if request.path_info != '/health':
-            request.session['django_language'] = 'en'
         response = self.get_response(request)
         response.set_cookie('django_language', 'en', max_age=31536000)
         return response

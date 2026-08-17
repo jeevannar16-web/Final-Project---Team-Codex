@@ -28,7 +28,7 @@ jobs:
       - name: Wait for Render deploy and verify
         run: |
           echo "Waiting for Render to deploy..."
-          URL="https://ojt-ecommerce-website.onrender.com"
+          URL="https://ojt-ecommerce-website.onrender.com/health"
           for i in $(seq 1 30); do
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL" 2>/dev/null || echo "000")
             if [ "$HTTP_CODE" = "200" ]; then

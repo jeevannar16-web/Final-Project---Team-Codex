@@ -53,7 +53,7 @@
 
   function verifyOnline() {
     if (!banner) return;
-    fetch(window.location.origin + '/', { method: 'HEAD', cache: 'no-cache' })
+    fetch(window.location.origin + '/health', { method: 'HEAD', cache: 'no-cache' })
       .then(function () { banner.style.display = 'none'; })
       .catch(function () { banner.style.display = 'flex'; });
   }
